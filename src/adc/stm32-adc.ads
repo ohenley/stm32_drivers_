@@ -121,7 +121,7 @@ package STM32.ADC is
       Resolution : ADC_Resolution;
       Alignment  : Data_Alignment)
     with
-      Post => Current_Resolution (This) = Resolution and
+      Post => Current_Resolution (This) = Resolution and then
               Current_Alignment (This) = Alignment;
 
    function Current_Resolution (This : Analog_To_Digital_Converter)
@@ -199,11 +199,11 @@ package STM32.ADC is
      with
        Pre => Conversions'Length > 0,
        Post =>
-         Length_Matches_Expected (This, Conversions) and
+         Length_Matches_Expected (This, Conversions) and then
          --  if there are multiple channels to be converted, we must want to
          --  scan them so we set Scan_Mode accordingly
-         (if Conversions'Length > 1 then Scan_Mode_Enabled (This)) and
-         (if Enable_EOC then EOC_Selection_Enabled (This)) and
+         (if Conversions'Length > 1 then Scan_Mode_Enabled (This)) and then
+         (if Enable_EOC then EOC_Selection_Enabled (This)) and then
          --  The VBat and VRef internal connections are enabled if This is
          --  ADC_1 and the corresponding channels are included in the lists.
          (VBat_May_Be_Enabled (This, Conversions) or else
@@ -288,13 +288,13 @@ package STM32.ADC is
       Conversions   : Injected_Channel_Conversions)
      with
        Pre =>
-         Conversions'Length > 0 and
-         (if AutoInjection then Trigger = Software_Triggered_Injected) and
+         Conversions'Length > 0 and then
+         (if AutoInjection then Trigger = Software_Triggered_Injected) and then
          (if AutoInjection then
            not Discontinuous_Mode_Injected_Enabled (This)),
        Post =>
-         Length_Is_Expected (This, Conversions) and
-         (if Enable_EOC then EOC_Selection_Enabled (This)) and
+         Length_Is_Expected (This, Conversions) and then
+         (if Enable_EOC then EOC_Selection_Enabled (This)) and then
          --  The VBat and VRef internal connections are enabled if This is
          --  ADC_1 and the corresponding channels are included in the lists.
          (VBat_May_Be_Enabled (This, Conversions)  or else
@@ -376,10 +376,10 @@ package STM32.ADC is
        Pre => not AutoInjection_Enabled (This),
        Post =>
          (if Regular then
-            (Discontinuous_Mode_Regular_Enabled (This)) and
+            (Discontinuous_Mode_Regular_Enabled (This)) and then
             (not Discontinuous_Mode_Injected_Enabled (This))
           else
-            (not Discontinuous_Mode_Regular_Enabled (This)) and
+            (not Discontinuous_Mode_Regular_Enabled (This)) and then
             (Discontinuous_Mode_Injected_Enabled (This)));
    --  Enables discontinuous mode and sets the count. If Regular is True,
    --  enables the mode only for regular channels. If Regular is False, enables
@@ -738,14 +738,14 @@ private
      (This    : Analog_To_Digital_Converter;
       Channel : Analog_Input_Channel)
       return Boolean
-   is (This'Address = STM32_SVD.ADC.ADC1_Periph'Address and
+   is (This'Address = STM32_SVD.ADC.ADC1_Periph'Address and then
          Channel = VBat_Channel);
 
    function VRef_TemperatureSensor_Conversion
      (This    : Analog_To_Digital_Converter;
       Channel : Analog_Input_Channel)
       return Boolean
-   is (This'Address = STM32_SVD.ADC.ADC1_Periph'Address and
+   is (This'Address = STM32_SVD.ADC.ADC1_Periph'Address and then
          (Channel in VRef_Channel | TemperatureSensor_Channel));
 
 end STM32.ADC;

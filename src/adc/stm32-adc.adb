@@ -528,7 +528,7 @@ package body STM32.ADC is
    function Watchdog_Enabled (This : Analog_To_Digital_Converter)
      return Boolean
    is
-      (This.CR1.AWDEN or This.CR1.JAWDEN);
+      (This.CR1.AWDEN or else This.CR1.JAWDEN);
    --  per the RM table 66, section 13.3.7, pg 391
 
    -------------------------------
