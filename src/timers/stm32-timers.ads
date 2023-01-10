@@ -66,7 +66,7 @@ package STM32.Timers is
      (This : in out Timer; Prescaler : UInt16; Period : UInt32) with
      Pre  => (if Period > UInt32 (UInt16'Last) then Has_32bit_Counter (This)),
      Post =>
-      Current_Prescaler (This) = Prescaler and
+      Current_Prescaler (This) = Prescaler and then
       Current_Autoreload (This) = Period;
 
    procedure Set_Counter (This : in out Timer; Value : UInt16) with
@@ -123,12 +123,12 @@ package STM32.Timers is
       Clock_Divisor :        Timer_Clock_Divisor;
       Counter_Mode  :        Timer_Counter_Alignment_Mode) with
      Pre =>
-      not Basic_Timer (This) and
+      not Basic_Timer (This) and then
       (if Period > UInt32 (UInt16'Last) then Has_32bit_Counter (This)),
      Post =>
-      Current_Prescaler (This) = Prescaler and
-      Current_Clock_Division (This) = Clock_Divisor and
-      Current_Counter_Mode (This) = Counter_Mode and
+      Current_Prescaler (This) = Prescaler and then
+      Current_Clock_Division (This) = Clock_Divisor and then
+      Current_Counter_Mode (This) = Counter_Mode and then
       Current_Autoreload (This) = Period;
 
    type Timer_Prescaler_Reload_Mode is (Update, Immediate);
@@ -177,7 +177,7 @@ package STM32.Timers is
    procedure Enable_Interrupt
      (This : in out Timer; Source : Timer_Interrupt) with
      Pre =>
-      (if Basic_Timer (This) then Source = Timer_Update_Interrupt) and
+      (if Basic_Timer (This) then Source = Timer_Update_Interrupt) and then
       (if Source in Timer_COM_Interrupt | Timer_Break_Interrupt then
          Advanced_Timer (This)),
      Post => Interrupt_Enabled (This, Source);
@@ -188,7 +188,7 @@ package STM32.Timers is
      (This : in out Timer; Sources : Timer_Interrupt_List) with
      Pre =>
       (for all Source of Sources =>
-         (if Basic_Timer (This) then Source = Timer_Update_Interrupt) and
+         (if Basic_Timer (This) then Source = Timer_Update_Interrupt) and then
          (if Source in Timer_COM_Interrupt | Timer_Break_Interrupt then
             Advanced_Timer (This))),
      Post => (for all Source of Sources => Interrupt_Enabled (This, Source));
@@ -196,7 +196,7 @@ package STM32.Timers is
    procedure Disable_Interrupt
      (This : in out Timer; Source : Timer_Interrupt) with
      Pre =>
-      (if Basic_Timer (This) then Source = Timer_Update_Interrupt) and
+      (if Basic_Timer (This) then Source = Timer_Update_Interrupt) and then
       (if Source in Timer_COM_Interrupt | Timer_Break_Interrupt then
          Advanced_Timer (This)),
      Post => not Interrupt_Enabled (This, Source);
@@ -204,14 +204,14 @@ package STM32.Timers is
    procedure Clear_Pending_Interrupt
      (This : in out Timer; Source : Timer_Interrupt) with
      Pre =>
-      (if Basic_Timer (This) then Source = Timer_Update_Interrupt) and
+      (if Basic_Timer (This) then Source = Timer_Update_Interrupt) and then
       (if Source in Timer_COM_Interrupt | Timer_Break_Interrupt then
          Advanced_Timer (This));
 
    function Interrupt_Enabled
      (This : Timer; Source : Timer_Interrupt) return Boolean with
      Pre =>
-      (if Basic_Timer (This) then Source = Timer_Update_Interrupt) and
+      (if Basic_Timer (This) then Source = Timer_Update_Interrupt) and then
       (if Source in Timer_COM_Interrupt | Timer_Break_Interrupt then
          Advanced_Timer (This));
 
@@ -230,7 +230,7 @@ package STM32.Timers is
    procedure Generate_Event
      (This : in out Timer; Source : Timer_Event_Source) with
      Pre =>
-      (if Basic_Timer (This) then Source = Event_Source_Update) and
+      (if Basic_Timer (This) then Source = Event_Source_Update) and then
       (if Source in Event_Source_COM | Event_Source_Break then
          Advanced_Timer (This));
 
@@ -256,13 +256,13 @@ package STM32.Timers is
 
    function Status (This : Timer; Flag : Timer_Status_Flag) return Boolean with
      Pre =>
-      (if Basic_Timer (This) then Flag = Timer_Update_Indicated) and
+      (if Basic_Timer (This) then Flag = Timer_Update_Indicated) and then
       (if Flag in Timer_COM_Indicated | Timer_Break_Indicated then
          Advanced_Timer (This));
 
    procedure Clear_Status (This : in out Timer; Flag : Timer_Status_Flag) with
      Pre =>
-      (if Basic_Timer (This) then Flag = Timer_Update_Indicated) and
+      (if Basic_Timer (This) then Flag = Timer_Update_Indicated) and then
       (if Flag in Timer_COM_Indicated | Timer_Break_Indicated then
          Advanced_Timer (This)),
      Post => not Status (This, Flag);
@@ -285,7 +285,7 @@ package STM32.Timers is
    procedure Enable_DMA_Source
      (This : in out Timer; Source : Timer_DMA_Source) with
      Pre =>
-      ((if Basic_Timer (This) then Source = Timer_DMA_Update) and
+      ((if Basic_Timer (This) then Source = Timer_DMA_Update) and then
        (if Source in Timer_DMA_COM | Timer_DMA_Trigger then
           Advanced_Timer (This)))
       or else DMA_Supported (This),
@@ -294,7 +294,7 @@ package STM32.Timers is
    procedure Disable_DMA_Source
      (This : in out Timer; Source : Timer_DMA_Source) with
      Pre =>
-      ((if Basic_Timer (This) then Source = Timer_DMA_Update) and
+      ((if Basic_Timer (This) then Source = Timer_DMA_Update) and then
        (if Source in Timer_DMA_COM | Timer_DMA_Trigger then
           Advanced_Timer (This)))
       or else DMA_Supported (This),
@@ -303,7 +303,7 @@ package STM32.Timers is
    function DMA_Source_Enabled
      (This : Timer; Source : Timer_DMA_Source) return Boolean with
      Pre =>
-      ((if Basic_Timer (This) then Source = Timer_DMA_Update) and
+      ((if Basic_Timer (This) then Source = Timer_DMA_Update) and then
        (if Source in Timer_DMA_COM | Timer_DMA_Trigger then
           Advanced_Timer (This)))
       or else DMA_Supported (This);
@@ -382,8 +382,8 @@ package STM32.Timers is
       State    :        Timer_Capture_Compare_State; Pulse : UInt32;
       Polarity :        Timer_Output_Compare_Polarity) with
      Pre =>
-      (CC_Channel_Exists (This, Channel) and
-       Specific_Channel_Output_Supported (This, Channel)) and
+      (CC_Channel_Exists (This, Channel) and then
+       Specific_Channel_Output_Supported (This, Channel)) and then
       (if not Has_32bit_CC_Values (This) then Pulse <= 16#FFFF#),
      Post =>
       (if State = Enable then Channel_Enabled (This, Channel)
@@ -420,35 +420,35 @@ package STM32.Timers is
      (This : in out Timer; Channel : Timer_Channel;
       Mode :        Timer_Output_Compare_And_PWM_Mode) with
      Pre =>
-      (not Basic_Timer (This)) and
+      (not Basic_Timer (This)) and then
       (if Current_Capture_Compare_Mode (This, Channel) /= Output then
          raise Timer_Channel_Access_Error);
 
    procedure Set_Output_Preload_Enable
      (This : in out Timer; Channel : Timer_Channel; Enabled : Boolean) with
      Pre =>
-      CC_Channel_Exists (This, Channel) and
+      CC_Channel_Exists (This, Channel) and then
       (if Current_Capture_Compare_Mode (This, Channel) /= Output then
          raise Timer_Channel_Access_Error);
 
    procedure Set_Output_Fast_Enable
      (This : in out Timer; Channel : Timer_Channel; Enabled : Boolean) with
      Pre =>
-      CC_Channel_Exists (This, Channel) and
+      CC_Channel_Exists (This, Channel) and then
       (if Current_Capture_Compare_Mode (This, Channel) /= Output then
          raise Timer_Channel_Access_Error);
 
    procedure Set_Clear_Control
      (This : in out Timer; Channel : Timer_Channel; Enabled : Boolean) with
      Pre =>
-      CC_Channel_Exists (This, Channel) and
+      CC_Channel_Exists (This, Channel) and then
       (if Current_Capture_Compare_Mode (This, Channel) /= Output then
          raise Timer_Channel_Access_Error);
 
    procedure Set_Output_Forced_Action
      (This : in out Timer; Channel : Timer_Channel; Active : Boolean) with
      Pre =>
-      CC_Channel_Exists (This, Channel) and
+      CC_Channel_Exists (This, Channel) and then
       (if Current_Capture_Compare_Mode (This, Channel) /= Output then
          raise Timer_Channel_Access_Error);
 
@@ -492,10 +492,10 @@ package STM32.Timers is
       Prescaler :        Timer_Input_Capture_Prescaler;
       Filter    :        Timer_Input_Capture_Filter) with
      Pre =>
-      CC_Channel_Exists (This, Channel) and
+      CC_Channel_Exists (This, Channel) and then
       (if Filter > 7 then Advanced_Timer (This)),
      Post =>
-      Channel_Enabled (This, Channel) and
+      Channel_Enabled (This, Channel) and then
       Current_Capture_Compare_Mode (This, Channel) = Selection;
 
    procedure Configure_Channel_Input_PWM
@@ -505,17 +505,17 @@ package STM32.Timers is
       Prescaler :        Timer_Input_Capture_Prescaler;
       Filter    :        Timer_Input_Capture_Filter) with
      Pre =>
-      Has_At_Least_2_CC_Channels (This) and Channel in Channel_1 | Channel_2,
+      Has_At_Least_2_CC_Channels (This) and then Channel in Channel_1 | Channel_2,
      Post =>
-      Channel_Enabled (This, Channel) and
-      Current_Capture_Compare_Mode (This, Channel) = Selection and
+      Channel_Enabled (This, Channel) and then
+      Current_Capture_Compare_Mode (This, Channel) = Selection and then
       Current_Input_Prescaler (This, Channel) = Prescaler;
 
    procedure Set_Input_Prescaler
      (This  : in out Timer; Channel : Timer_Channel;
       Value :        Timer_Input_Capture_Prescaler) with
      Pre =>
-      not Basic_Timer (This) and
+      not Basic_Timer (This) and then
       Current_Capture_Compare_Mode (This, Channel) /= Output,
      Post => Current_Input_Prescaler (This, Channel) = Value;
 
@@ -553,10 +553,10 @@ package STM32.Timers is
       Clock_Divisor :        Timer_Clock_Divisor;
       Counter_Mode  : Timer_Counter_Alignment_Mode; Repetitions : UInt8) with
      Pre =>
-      Advanced_Timer (This) and
+      Advanced_Timer (This) and then
       (if Period > UInt32 (UInt16'Last) then Has_32bit_Counter (This)),
      Post =>
-      Current_Prescaler (This) = Prescaler and
+      Current_Prescaler (This) = Prescaler and then
       Current_Autoreload (This) = Period;
 
    procedure Configure_Channel_Output
@@ -568,7 +568,7 @@ package STM32.Timers is
       Complementary_Polarity   :        Timer_Output_Compare_Polarity;
       Complementary_Idle_State :        Timer_Capture_Compare_State) with
      Pre =>
-      Advanced_Timer (This) and
+      Advanced_Timer (This) and then
       (if not Has_32bit_CC_Values (This) then Pulse <= 16#FFFF#),
      Post =>
       (if State = Enable then Channel_Enabled (This, Channel)
@@ -746,17 +746,17 @@ package STM32.Timers is
 
    --  Timers 6 and 7
    function Basic_Timer (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM6_Base or
+     (This'Address = STM32_SVD.TIM6_Base or else
       This'Address = STM32_SVD.TIM7_Base);
 
    --  Timers 1 and 8
    function Advanced_Timer (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM1_Base or
+     (This'Address = STM32_SVD.TIM1_Base or else
       This'Address = STM32_SVD.TIM8_Base);
 
    --  Timers 2 and 5
    function Has_32bit_Counter (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM2_Base or
+     (This'Address = STM32_SVD.TIM2_Base or else
    --  The RM register map for timers 2 through 5, pg 634, indicates that
    --  only timer 2 and timer 5 actually have the upper half of the counter
    --  available, and that the others must keep it reserved. This would
@@ -771,53 +771,53 @@ package STM32.Timers is
 
    --  Timers 1 .. 8
    function Trigger_Output_Selectable (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM1_Base or
-      This'Address = STM32_SVD.TIM2_Base or
-      This'Address = STM32_SVD.TIM3_Base or
-      This'Address = STM32_SVD.TIM4_Base or
-      This'Address = STM32_SVD.TIM5_Base or
-      This'Address = STM32_SVD.TIM6_Base or
-      This'Address = STM32_SVD.TIM7_Base or
+     (This'Address = STM32_SVD.TIM1_Base or else
+      This'Address = STM32_SVD.TIM2_Base or else
+      This'Address = STM32_SVD.TIM3_Base or else
+      This'Address = STM32_SVD.TIM4_Base or else
+      This'Address = STM32_SVD.TIM5_Base or else
+      This'Address = STM32_SVD.TIM6_Base or else
+      This'Address = STM32_SVD.TIM7_Base or else
       This'Address = STM32_SVD.TIM8_Base);
 
    --  Timers 1 .. 5, 8, 9, 12
    function Has_At_Least_2_CC_Channels (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM1_Base or
-      This'Address = STM32_SVD.TIM2_Base or
-      This'Address = STM32_SVD.TIM3_Base or
-      This'Address = STM32_SVD.TIM4_Base or
-      This'Address = STM32_SVD.TIM5_Base or
-      This'Address = STM32_SVD.TIM8_Base or
-      This'Address = STM32_SVD.TIM9_Base or
+     (This'Address = STM32_SVD.TIM1_Base or else
+      This'Address = STM32_SVD.TIM2_Base or else
+      This'Address = STM32_SVD.TIM3_Base or else
+      This'Address = STM32_SVD.TIM4_Base or else
+      This'Address = STM32_SVD.TIM5_Base or else
+      This'Address = STM32_SVD.TIM8_Base or else
+      This'Address = STM32_SVD.TIM9_Base or else
       This'Address = STM32_SVD.TIM12_Base);
 
    --  Timers 1 .. 5, 8
    function Hall_Sensor_Supported (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM1_Base or
-      This'Address = STM32_SVD.TIM2_Base or
-      This'Address = STM32_SVD.TIM3_Base or
-      This'Address = STM32_SVD.TIM4_Base or
-      This'Address = STM32_SVD.TIM5_Base or
+     (This'Address = STM32_SVD.TIM1_Base or else
+      This'Address = STM32_SVD.TIM2_Base or else
+      This'Address = STM32_SVD.TIM3_Base or else
+      This'Address = STM32_SVD.TIM4_Base or else
+      This'Address = STM32_SVD.TIM5_Base or else
       This'Address = STM32_SVD.TIM8_Base);
 
    --  Timers 1 .. 5, 8, 9, 12
    function Clock_Management_Supported (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM1_Base or
-      This'Address = STM32_SVD.TIM2_Base or
-      This'Address = STM32_SVD.TIM3_Base or
-      This'Address = STM32_SVD.TIM4_Base or
-      This'Address = STM32_SVD.TIM5_Base or
-      This'Address = STM32_SVD.TIM8_Base or
-      This'Address = STM32_SVD.TIM9_Base or
+     (This'Address = STM32_SVD.TIM1_Base or else
+      This'Address = STM32_SVD.TIM2_Base or else
+      This'Address = STM32_SVD.TIM3_Base or else
+      This'Address = STM32_SVD.TIM4_Base or else
+      This'Address = STM32_SVD.TIM5_Base or else
+      This'Address = STM32_SVD.TIM8_Base or else
+      This'Address = STM32_SVD.TIM9_Base or else
       This'Address = STM32_SVD.TIM12_Base);
 
    --  Timers 1 .. 5, 8
    function Has_At_Least_3_CC_Channels (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM1_Base or
-      This'Address = STM32_SVD.TIM2_Base or
-      This'Address = STM32_SVD.TIM3_Base or
-      This'Address = STM32_SVD.TIM4_Base or
-      This'Address = STM32_SVD.TIM5_Base or
+     (This'Address = STM32_SVD.TIM1_Base or else
+      This'Address = STM32_SVD.TIM2_Base or else
+      This'Address = STM32_SVD.TIM3_Base or else
+      This'Address = STM32_SVD.TIM4_Base or else
+      This'Address = STM32_SVD.TIM5_Base or else
       This'Address = STM32_SVD.TIM8_Base);
 
    --  Timers 1 .. 5, 8
@@ -827,55 +827,55 @@ package STM32.Timers is
    --  Not all timers have four channels available for capture/compare
    function CC_Channel_Exists
      (This : Timer; Channel : Timer_Channel) return Boolean is
-     ((if Channel = Channel_1 then not Basic_Timer (This)) or
-      (if Channel = Channel_2 then Has_At_Least_2_CC_Channels (This)) or
-      (if Channel = Channel_3 then Has_At_Least_3_CC_Channels (This)) or
+     ((if Channel = Channel_1 then not Basic_Timer (This)) or else
+      (if Channel = Channel_2 then Has_At_Least_2_CC_Channels (This)) or else
+      (if Channel = Channel_3 then Has_At_Least_3_CC_Channels (This)) or else
       (if Channel = Channel_4 then Has_At_Least_4_CC_Channels (This)));
 
    --  Timers 1 .. 5, 8
    function Input_XOR_Supported (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM1_Base or
-      This'Address = STM32_SVD.TIM2_Base or
-      This'Address = STM32_SVD.TIM3_Base or
-      This'Address = STM32_SVD.TIM4_Base or
-      This'Address = STM32_SVD.TIM5_Base or
+     (This'Address = STM32_SVD.TIM1_Base or else
+      This'Address = STM32_SVD.TIM2_Base or else
+      This'Address = STM32_SVD.TIM3_Base or else
+      This'Address = STM32_SVD.TIM4_Base or else
+      This'Address = STM32_SVD.TIM5_Base or else
       This'Address = STM32_SVD.TIM8_Base);
 
    --  Timers 1 .. 8
    function DMA_Supported (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM1_Base or
-      This'Address = STM32_SVD.TIM2_Base or
-      This'Address = STM32_SVD.TIM3_Base or
-      This'Address = STM32_SVD.TIM4_Base or
-      This'Address = STM32_SVD.TIM5_Base or
-      This'Address = STM32_SVD.TIM6_Base or
-      This'Address = STM32_SVD.TIM7_Base or
+     (This'Address = STM32_SVD.TIM1_Base or else
+      This'Address = STM32_SVD.TIM2_Base or else
+      This'Address = STM32_SVD.TIM3_Base or else
+      This'Address = STM32_SVD.TIM4_Base or else
+      This'Address = STM32_SVD.TIM5_Base or else
+      This'Address = STM32_SVD.TIM6_Base or else
+      This'Address = STM32_SVD.TIM7_Base or else
       This'Address = STM32_SVD.TIM8_Base);
 
    --  Timers 1 .. 5, 8, 9, 12
    function Slave_Mode_Supported (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM1_Base or
-      This'Address = STM32_SVD.TIM2_Base or
-      This'Address = STM32_SVD.TIM3_Base or
-      This'Address = STM32_SVD.TIM4_Base or
-      This'Address = STM32_SVD.TIM5_Base or
-      This'Address = STM32_SVD.TIM8_Base or
-      This'Address = STM32_SVD.TIM9_Base or
+     (This'Address = STM32_SVD.TIM1_Base or else
+      This'Address = STM32_SVD.TIM2_Base or else
+      This'Address = STM32_SVD.TIM3_Base or else
+      This'Address = STM32_SVD.TIM4_Base or else
+      This'Address = STM32_SVD.TIM5_Base or else
+      This'Address = STM32_SVD.TIM8_Base or else
+      This'Address = STM32_SVD.TIM9_Base or else
       This'Address = STM32_SVD.TIM12_Base);
 
    --  Timers 1 .. 5, 8
    function External_Trigger_Supported (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM1_Base or
-      This'Address = STM32_SVD.TIM2_Base or
-      This'Address = STM32_SVD.TIM3_Base or
-      This'Address = STM32_SVD.TIM4_Base or
-      This'Address = STM32_SVD.TIM5_Base or
+     (This'Address = STM32_SVD.TIM1_Base or else
+      This'Address = STM32_SVD.TIM2_Base or else
+      This'Address = STM32_SVD.TIM3_Base or else
+      This'Address = STM32_SVD.TIM4_Base or else
+      This'Address = STM32_SVD.TIM5_Base or else
       This'Address = STM32_SVD.TIM8_Base);
 
    --  Timers 2, 5, 11
    function Remapping_Capability_Supported (This : Timer) return Boolean is
-     (This'Address = STM32_SVD.TIM2_Base or
-      This'Address = STM32_SVD.TIM5_Base or
+     (This'Address = STM32_SVD.TIM2_Base or else
+      This'Address = STM32_SVD.TIM5_Base or else
       This'Address = STM32_SVD.TIM11_Base);
 
    --  Not all timers support output on all channels

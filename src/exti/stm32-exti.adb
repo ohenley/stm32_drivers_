@@ -131,5 +131,4 @@ package body STM32.EXTI is
       EXTI_Periph.PR.PR.Arr (External_Line_Number'Pos (Line)) := True;
    end Clear_External_Interrupt;
 
-
 end STM32.EXTI;

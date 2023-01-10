@@ -54,7 +54,7 @@ package body STM32.USARTs is
       Clocks : constant RCC_System_Clocks := System_Clock_Frequencies;
    begin
       if This.Periph.all'Address = USART1_Base
-        or
+        or else
          This.Periph.all'Address = USART6_Base
       then
          return Clocks.PCLK2;

@@ -95,7 +95,7 @@ package STM32.I2S is
           Post => not This.Enabled;
 
    procedure Enable (This : in out I2S_Port)
-     with Post => This.Enabled and This.In_I2S_Mode;
+     with Post => This.Enabled and then This.In_I2S_Mode;
 
    procedure Disable (This : in out I2S_Port)
      with Pre => This.In_I2S_Mode;

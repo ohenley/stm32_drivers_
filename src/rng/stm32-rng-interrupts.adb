@@ -43,7 +43,7 @@ with Ada.Interrupts.Names;
 
 package body STM32.RNG.Interrupts is
 
-   type Buffer_Content is array (Integer range <>) of BT.Uint32;
+   type Buffer_Content is array (Integer range <>) of BT.UInt32;
 
    type Ring_Buffer is record
       Content : Buffer_Content (0 .. 9);
@@ -57,10 +57,10 @@ package body STM32.RNG.Interrupts is
 
    protected Receiver is
       pragma Interrupt_Priority;
-      entry Get_Random_32 (Value : out BT.Uint32);
+      entry Get_Random_32 (Value : out BT.UInt32);
    private
 
-      Last           : BT.Uint32 := 0;
+      Last           : BT.UInt32 := 0;
       Buffer         : Ring_Buffer;
       Data_Available : Boolean   := False;
 
@@ -81,7 +81,7 @@ package body STM32.RNG.Interrupts is
       -- Get_Random_32 --
       -------------------
 
-      entry Get_Random_32 (Value : out BT.Uint32) when Data_Available is
+      entry Get_Random_32 (Value : out BT.UInt32) when Data_Available is
          Next : constant Integer :=
            (Buffer.Tail + 1) mod Buffer.Content'Length;
       begin
@@ -103,7 +103,7 @@ package body STM32.RNG.Interrupts is
       -----------------------
 
       procedure Interrupt_Handler is
-         Current : BT.Uint32;
+         Current : BT.UInt32;
       begin
          if RNG_Seed_Error_Status then
             Clear_RNG_Seed_Error_Status;
@@ -148,7 +148,7 @@ package body STM32.RNG.Interrupts is
    --------------------
 
    procedure Initialize_RNG is
-      Discard : BT.Uint32;
+      Discard : BT.UInt32;
    begin
       Enable_RNG_Clock;
       Enable_RNG_Interrupt;
@@ -163,8 +163,8 @@ package body STM32.RNG.Interrupts is
    -- Random --
    ------------
 
-   function Random return BT.Uint32 is
-      Result : BT.Uint32;
+   function Random return BT.UInt32 is
+      Result : BT.UInt32;
    begin
       Receiver.Get_Random_32 (Result);
       return Result;
