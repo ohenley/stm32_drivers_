@@ -62,13 +62,12 @@ package body STM32.RNG.Interrupts is
 
       Last           : BT.Uint32 := 0;
       Buffer         : Ring_Buffer;
-      Data_Available : Boolean := False;
+      Data_Available : Boolean   := False;
 
       procedure Interrupt_Handler;
 
       pragma Attach_Handler
-        (Interrupt_Handler,
-         Ada.Interrupts.Names.HASH_RNG_Interrupt);
+        (Interrupt_Handler, Ada.Interrupts.Names.HASH_RNG_Interrupt);
 
    end Receiver;
 
@@ -87,7 +86,7 @@ package body STM32.RNG.Interrupts is
            (Buffer.Tail + 1) mod Buffer.Content'Length;
       begin
          --  Remove an item from our ring buffer.
-         Value := Buffer.Content (Next);
+         Value       := Buffer.Content (Next);
          Buffer.Tail := Next;
 
          --  If the buffer is empty, make sure we block subsequent callers
@@ -136,7 +135,7 @@ package body STM32.RNG.Interrupts is
                   Buffer.Content (Buffer.Head) := Current;
 
                   Data_Available := True;
-                  Last := Current;
+                  Last           := Current;
                end if;
             end if;
          end if;
