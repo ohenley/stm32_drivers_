@@ -18,12 +18,13 @@ stm32f429x_svd = "1.0.0"
 
 #[configuration.values]
 
-
 [configuration.variables]
 board = { type = "Enum", values = ["stm32f429disco"], default = "stm32f429disco" }
 runtime = { type = "Enum", values = ["embedded"], default = "embedded" }
+stm32_adc_driver = {type = "Boolean", default = false}
 
-#adc = {type = "Boolean", default = true}
+
+
 #dac = {type = "Boolean", default = false}
 #dcmi = {type = "Boolean", default = false}
 #device_id = {type = "Boolean", default = false}
