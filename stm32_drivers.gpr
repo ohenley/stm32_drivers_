@@ -1,10 +1,15 @@
 with "config/stm32_drivers_config.gpr";
-with "config/stm32_svd_config.gpr";
+with "config/stm32_config_config.gpr";
 project Stm32_Drivers is
 
    for Target use "arm-eabi";
-   for Runtime ("Ada") use stm32_svd_config.Runtime & "-" & stm32_svd_config.Board;
-
+   case Stm32_Config_Config.Runtime is
+      when "light_tasking" => 
+         for Runtime ("Ada") use "light-tasking-" & Stm32_Config_Config.Board;
+      when others =>
+         for Runtime ("Ada") use Stm32_Config_Config.Runtime & "-" & Stm32_Config_Config.Board;
+   end case;
+   
    for Library_Name use "Stm32_Drivers";
    for Library_Version use Project'Library_Name & ".so." & Stm32_Drivers_Config.Crate_Version;
 
@@ -29,8 +34,8 @@ project Stm32_Drivers is
                        "src/spi",
                        "src/syscfg",
                        "src/timers");
-   case stm32_svd_config.Board is
-      when "stm32f429disco" =>
+   case Stm32_Config_Config.Mcu is
+      when "stm32f429x" =>
          Driver_Src_Dirs := Driver_Src_Dirs & ("src/stm32f4/dma",
                                                "src/stm32f4/i2c",
                                                "src/stm32f4/power_control",
