@@ -50,7 +50,8 @@ package body STM32.DAC is
    ------------
 
    procedure Enable
-     (This : in out Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
    is
    begin
       case Channel is
@@ -66,7 +67,8 @@ package body STM32.DAC is
    -------------
 
    procedure Disable
-     (This : in out Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
    is
    begin
       case Channel is
@@ -82,8 +84,9 @@ package body STM32.DAC is
    -------------
 
    function Enabled
-     (This : Digital_To_Analog_Converter; Channel : DAC_Channel) return Boolean
-   is
+     (This    : Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
+      return Boolean is
    begin
       case Channel is
          when Channel_1 =>
@@ -98,8 +101,11 @@ package body STM32.DAC is
    ----------------
 
    procedure Set_Output
-     (This  : in out Digital_To_Analog_Converter; Channel : DAC_Channel;
-      Value : UInt32; Resolution : DAC_Resolution; Alignment : Data_Alignment)
+     (This       : in out Digital_To_Analog_Converter;
+      Channel    : DAC_Channel;
+      Value      : UInt32;
+      Resolution : DAC_Resolution;
+      Alignment  : Data_Alignment)
    is
    begin
       case Channel is
@@ -116,8 +122,7 @@ package body STM32.DAC is
                           UInt12 (Value and Max_12bit_Resolution);
                   end case;
                when DAC_Resolution_8_Bits =>
-                  This.DHR8R1.DACC1DHR :=
-                    UInt8 (Value and Max_8bit_Resolution);
+                  This.DHR8R1.DACC1DHR := UInt8 (Value and Max_8bit_Resolution);
             end case;
 
          when Channel_2 =>
@@ -132,8 +137,7 @@ package body STM32.DAC is
                           UInt12 (Value and Max_12bit_Resolution);
                   end case;
                when DAC_Resolution_8_Bits =>
-                  This.DHR8R2.DACC2DHR :=
-                    UInt8 (Value and Max_8bit_Resolution);
+                  This.DHR8R2.DACC2DHR := UInt8 (Value and Max_8bit_Resolution);
             end case;
 
       end case;
@@ -144,7 +148,8 @@ package body STM32.DAC is
    ------------------------------------
 
    procedure Trigger_Conversion_By_Software
-     (This : in out Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
    is
    begin
       case Channel is
@@ -160,7 +165,9 @@ package body STM32.DAC is
    ----------------------------
 
    function Converted_Output_Value
-     (This : Digital_To_Analog_Converter; Channel : DAC_Channel) return UInt32
+     (This    : Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
+      return UInt32
    is
    begin
       case Channel is
@@ -176,9 +183,11 @@ package body STM32.DAC is
    ------------------------------
 
    procedure Set_Dual_Output_Voltages
-     (This : in out Digital_To_Analog_Converter; Channel_1_Value : UInt32;
-      Channel_2_Value :        UInt32; Resolution : DAC_Resolution;
-      Alignment       :        Data_Alignment)
+     (This            : in out Digital_To_Analog_Converter;
+      Channel_1_Value : UInt32;
+      Channel_2_Value : UInt32;
+      Resolution      : DAC_Resolution;
+      Alignment       : Data_Alignment)
    is
    begin
       case Resolution is
@@ -207,8 +216,8 @@ package body STM32.DAC is
    -- Converted_Dual_Output_Value --
    ---------------------------------
 
-   function Converted_Dual_Output_Value
-     (This : Digital_To_Analog_Converter) return Dual_Channel_Output
+   function Converted_Dual_Output_Value (This : Digital_To_Analog_Converter)
+      return Dual_Channel_Output
    is
       Result : Dual_Channel_Output;
    begin
@@ -222,7 +231,8 @@ package body STM32.DAC is
    --------------------------
 
    procedure Enable_Output_Buffer
-     (This : in out Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
    is
    begin
       case Channel is
@@ -238,7 +248,8 @@ package body STM32.DAC is
    ---------------------------
 
    procedure Disable_Output_Buffer
-     (This : in out Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
    is
    begin
       case Channel is
@@ -254,7 +265,9 @@ package body STM32.DAC is
    ---------------------------
 
    function Output_Buffer_Enabled
-     (This : Digital_To_Analog_Converter; Channel : DAC_Channel) return Boolean
+     (This    : Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
+      return Boolean
    is
    begin
       case Channel is
@@ -270,8 +283,9 @@ package body STM32.DAC is
    --------------------
 
    procedure Select_Trigger
-     (This    : in out Digital_To_Analog_Converter; Channel : DAC_Channel;
-      Trigger :        External_Event_Trigger_Selection)
+     (This    : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel;
+      Trigger : External_Event_Trigger_Selection)
    is
    begin
       case Channel is
@@ -289,7 +303,8 @@ package body STM32.DAC is
    -----------------------
 
    function Trigger_Selection
-     (This : Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
       return External_Event_Trigger_Selection
    is
    begin
@@ -306,7 +321,8 @@ package body STM32.DAC is
    --------------------
 
    procedure Enable_Trigger
-     (This : in out Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
    is
    begin
       case Channel is
@@ -322,7 +338,8 @@ package body STM32.DAC is
    ---------------------
 
    procedure Disable_Trigger
-     (This : in out Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
    is
    begin
       case Channel is
@@ -338,7 +355,9 @@ package body STM32.DAC is
    ---------------------
 
    function Trigger_Enabled
-     (This : Digital_To_Analog_Converter; Channel : DAC_Channel) return Boolean
+     (This    : Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
+      return Boolean
    is
    begin
       case Channel is
@@ -354,7 +373,8 @@ package body STM32.DAC is
    ----------------
 
    procedure Enable_DMA
-     (This : in out Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
    is
    begin
       case Channel is
@@ -370,7 +390,8 @@ package body STM32.DAC is
    -----------------
 
    procedure Disable_DMA
-     (This : in out Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
    is
    begin
       case Channel is
@@ -386,7 +407,9 @@ package body STM32.DAC is
    -----------------
 
    function DMA_Enabled
-     (This : Digital_To_Analog_Converter; Channel : DAC_Channel) return Boolean
+     (This    : Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
+      return Boolean
    is
    begin
       case Channel is
@@ -402,7 +425,8 @@ package body STM32.DAC is
    ------------
 
    function Status
-     (This : Digital_To_Analog_Converter; Flag : DAC_Status_Flag)
+     (This : Digital_To_Analog_Converter;
+      Flag : DAC_Status_Flag)
       return Boolean
    is
    begin
@@ -419,7 +443,8 @@ package body STM32.DAC is
    ------------------
 
    procedure Clear_Status
-     (This : in out Digital_To_Analog_Converter; Flag : DAC_Status_Flag)
+     (This : in out Digital_To_Analog_Converter;
+      Flag : DAC_Status_Flag)
    is
    begin
       case Flag is
@@ -435,7 +460,8 @@ package body STM32.DAC is
    -----------------------
 
    procedure Enable_Interrupts
-     (This : in out Digital_To_Analog_Converter; Source : DAC_Interrupts)
+     (This : in out Digital_To_Analog_Converter;
+      Source : DAC_Interrupts)
    is
    begin
       case Source is
@@ -451,7 +477,8 @@ package body STM32.DAC is
    ------------------------
 
    procedure Disable_Interrupts
-     (This : in out Digital_To_Analog_Converter; Source : DAC_Interrupts)
+     (This   : in out Digital_To_Analog_Converter;
+      Source : DAC_Interrupts)
    is
    begin
       case Source is
@@ -467,7 +494,8 @@ package body STM32.DAC is
    -----------------------
 
    function Interrupt_Enabled
-     (This : Digital_To_Analog_Converter; Source : DAC_Interrupts)
+     (This   : Digital_To_Analog_Converter;
+      Source : DAC_Interrupts)
       return Boolean
    is
    begin
@@ -484,7 +512,8 @@ package body STM32.DAC is
    ----------------------
 
    function Interrupt_Source
-     (This : Digital_To_Analog_Converter) return DAC_Interrupts
+     (This : Digital_To_Analog_Converter)
+      return DAC_Interrupts
    is
    begin
       if This.CR.DMAUDRIE1 then
@@ -499,7 +528,8 @@ package body STM32.DAC is
    -----------------------------
 
    procedure Clear_Interrupt_Pending
-     (This : in out Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : in out Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
    is
    begin
       case Channel is
@@ -515,8 +545,9 @@ package body STM32.DAC is
    ----------------------------
 
    procedure Select_Wave_Generation
-     (This      : in out Digital_To_Analog_Converter; Channel : DAC_Channel;
-      Selection :        Wave_Generation)
+     (This      : in out Digital_To_Analog_Converter;
+      Channel   : DAC_Channel;
+      Selection : Wave_Generation)
    is
 
       function As_UInt4 is new Ada.Unchecked_Conversion
@@ -564,7 +595,8 @@ package body STM32.DAC is
    ------------------------------
 
    function Selected_Wave_Generation
-     (This : Digital_To_Analog_Converter; Channel : DAC_Channel)
+     (This    : Digital_To_Analog_Converter;
+      Channel : DAC_Channel)
       return Wave_Generation
    is
       Kind : Wave_Generation_Selection;
@@ -615,8 +647,11 @@ package body STM32.DAC is
    ------------------
 
    function Data_Address
-     (This       : Digital_To_Analog_Converter; Channel : DAC_Channel;
-      Resolution : DAC_Resolution; Alignment : Data_Alignment) return Address
+     (This       : Digital_To_Analog_Converter;
+      Channel    : DAC_Channel;
+      Resolution : DAC_Resolution;
+      Alignment  : Data_Alignment)
+      return Address
    is
       Result : Address;
    begin

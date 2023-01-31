@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                    Copyright (C) 2015, AdaCore                           --
+--                 Copyright (C) 2015-2018, AdaCore                         --
 --                                                                          --
 --  Redistribution and use in source and binary forms, with or without      --
 --  modification, are permitted provided that the following conditions are  --
@@ -75,8 +75,6 @@ package STM32.GPIO is
    for GPIO_Pin'Size use 16;
    --  for compatibility with hardware registers
 
-   subtype GPIO_Pin_Index is Natural range 0 .. 15;
-
    type GPIO_Pins is array (Positive range <>) of GPIO_Pin;
    --  Note that, in addition to aggregates, the language-defined catenation
    --  operator "&" is available for types GPIO_Pin and GPIO_Pins, allowing one
@@ -88,6 +86,7 @@ package STM32.GPIO is
 
    type Pin_IO_Modes is (Mode_In, Mode_Out, Mode_AF, Mode_Analog)
      with Size => 2;
+
    for Pin_IO_Modes use
      (Mode_In     => 0,
       Mode_Out    => 1,
@@ -96,11 +95,12 @@ package STM32.GPIO is
 
    type Pin_Output_Types is (Push_Pull, Open_Drain)
      with Size => 1;
+
    for Pin_Output_Types use (Push_Pull => 0, Open_Drain => 1);
 
-   type Pin_Output_Speeds is
-     (Speed_2MHz,  Speed_25MHz, Speed_50MHz, Speed_100MHz)
+   type Pin_Output_Speeds is (Speed_2MHz,  Speed_25MHz, Speed_50MHz, Speed_100MHz)
      with Size => 2;
+
    for Pin_Output_Speeds use
      (Speed_2MHz   => 0,  -- low
       Speed_25MHz  => 1,  -- medium
@@ -114,26 +114,60 @@ package STM32.GPIO is
 
    type Internal_Pin_Resistors is (Floating, Pull_Up, Pull_Down)
      with Size => 2;
+
    for Internal_Pin_Resistors use (Floating  => 0,
                                    Pull_Up   => 1,
                                    Pull_Down => 2);
 
-   type GPIO_Port_Configuration is record
-      Mode        : Pin_IO_Modes;
-      Output_Type : Pin_Output_Types;
-      Speed       : Pin_Output_Speeds;
-      Resistors   : Internal_Pin_Resistors;
+   --  see the Reference Manual, table 35, section 8.3
+   type GPIO_Port_Configuration (Mode : Pin_IO_Modes := Mode_In) is record
+      Resistors : Internal_Pin_Resistors;
+      case Mode is
+         when Mode_In | Mode_Analog =>
+            null;
+         when Mode_Out =>
+            Output_Type : Pin_Output_Types;
+            Speed       : Pin_Output_Speeds;
+         when Mode_AF =>
+            AF_Output_Type : Pin_Output_Types;
+            AF_Speed       : Pin_Output_Speeds;
+            AF             : GPIO_Alternate_Function;
+      end case;
    end record;
 
    type GPIO_Point is new HAL.GPIO.GPIO_Point with record
       Periph : access GPIO_Port;
       --  Port should be a not null access, but this raises an exception
       --  during elaboration.
-      Pin    : GPIO_Pin_Index;
+      Pin    : GPIO_Pin;
    end record;
 
    overriding
+   function Support (This : GPIO_Point;
+                     Capa : HAL.GPIO.Capability)
+                     return Boolean
+   is (case Capa is
+          when others => True);
+   --  STM32 supports all GPIO capabilities
+
+   overriding
+   function Mode (This : GPIO_Point) return HAL.GPIO.GPIO_Mode;
+
+   overriding
+   procedure Set_Mode (This : in out GPIO_Point;
+                       Mode : HAL.GPIO.GPIO_Config_Mode);
+
+   overriding
+   function Pull_Resistor (This : GPIO_Point)
+                           return HAL.GPIO.GPIO_Pull_Resistor;
+
+   overriding
+   procedure Set_Pull_Resistor (This : in out GPIO_Point;
+                                Pull : HAL.GPIO.GPIO_Pull_Resistor);
+
+   overriding
    function Set (This : GPIO_Point) return Boolean with
+     Pre => Pin_IO_Mode (This) /= Mode_AF,
      Inline;
    --  Returns True if the bit specified by This.Pin is set (not zero) in the
    --  input data register of This.Port.all; returns False otherwise.
@@ -156,6 +190,11 @@ package STM32.GPIO is
    --  For This.Port.all, negates the output data register bit specified by
    --  This.Pin (one becomes zero and vice versa). Other pins are unaffected.
 
+   procedure Drive (This : in out GPIO_Point; Condition : Boolean) with
+      Post => (This.Set = Condition),
+      Inline;
+   --  Drives This high or low (set or clear) based on the value of Condition
+
    procedure Lock (This : GPIO_Point) with
      Pre  => not Locked (This),
      Post => Locked (This);
@@ -170,6 +209,8 @@ package STM32.GPIO is
       Config : GPIO_Port_Configuration);
    --  For Point.Pin on the Point.Port.all, configures the
    --  characteristics specified by Config
+
+   function Pin_IO_Mode (This : GPIO_Point) return Pin_IO_Modes with Inline;
 
    function Interrupt_Line_Number
      (This : GPIO_Point) return EXTI.External_Line_Number;

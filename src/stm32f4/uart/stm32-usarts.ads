@@ -190,7 +190,7 @@ package STM32.USARTs is
 
    procedure Resume_DMA_Transmission (This : in out USART) with
      Inline,
-     Post => DMA_Transmit_Requests_Enabled (This) and then
+     Post => DMA_Transmit_Requests_Enabled (This) and
              Enabled (This);
 
    procedure Pause_DMA_Reception (This : in out USART)
@@ -198,7 +198,7 @@ package STM32.USARTs is
 
    procedure Resume_DMA_Reception (This : in out USART) with
      Inline,
-     Post => DMA_Receive_Requests_Enabled (This) and then
+     Post => DMA_Receive_Requests_Enabled (This) and
              Enabled (This);
 
    function Data_Register_Address (This : USART) return System.Address with

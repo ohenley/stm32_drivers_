@@ -295,8 +295,6 @@ package body STM32.DMA is
       for Selected_Interrupt in Enabled_Interrupts'Range loop
          if Enabled_Interrupts (Selected_Interrupt) then
             Enable_Interrupt (This, Stream, Selected_Interrupt);
-         else
-            Disable_Interrupt (This, Stream, Selected_Interrupt);
          end if;
       end loop;
 
@@ -368,11 +366,6 @@ package body STM32.DMA is
       Result         : out DMA_Error_Code)
    is
       Deadline : constant Time := Clock + Timeout;
-
-      function Evaluate_Status return Boolean is
-         (Status (This, Stream, Transfer_Error_Indicated) or else
-          Status (This, Stream, FIFO_Error_Indicated) or else
-          Status (This, Stream, Direct_Mode_Error_Indicated));
    begin
       Result := DMA_No_Error;  -- initially anyway
 
@@ -385,8 +378,10 @@ package body STM32.DMA is
               Status (This, Stream, Half_Transfer_Complete_Indicated);
          end if;
 
-         if Evaluate_Status then
-
+         if Status (This, Stream, Transfer_Error_Indicated) or
+            Status (This, Stream, FIFO_Error_Indicated) or
+            Status (This, Stream, Direct_Mode_Error_Indicated)
+         then
             Clear_Status (This, Stream, Transfer_Error_Indicated);
             Clear_Status (This, Stream, FIFO_Error_Indicated);
             Clear_Status (This, Stream, Direct_Mode_Error_Indicated);

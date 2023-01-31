@@ -99,6 +99,7 @@ package STM32.EXTI is
    procedure Disable_External_Event (Line : External_Line_Number)
      with Inline;
 
+
    procedure Generate_SWI (Line : External_Line_Number)
      with Inline;
 

@@ -31,16 +31,13 @@
 
 with System; use System;
 
-pragma Warnings (Off, "* is an internal GNAT unit");
-with System.BB.Parameters;
-pragma Warnings (On, "* is an internal GNAT unit");
-
 with STM32_SVD.RCC; use STM32_SVD.RCC;
+
+with Stm32_Config_Config;
 
 package body STM32.Device is
 
-   HSE_VALUE : constant UInt32 :=
-                 UInt32 (System.BB.Parameters.HSE_Clock);
+   HSE_VALUE : constant UInt32 := Stm32_Config_Config.HSE_value;
    --  External oscillator in Hz
 
    HSI_VALUE : constant := 16_000_000;
@@ -366,7 +363,7 @@ package body STM32.Device is
    -- As_Port_Id --
    ----------------
 
-   function As_Port_Id (Port : I2C_Port) return I2C_Port_Id is
+   function As_Port_Id (Port : I2C_Port'Class) return I2C_Port_Id is
    begin
       if Port.Periph.all'Address = I2C1_Base then
          return I2C_Id_1;
@@ -383,7 +380,7 @@ package body STM32.Device is
    -- Enable_Clock --
    ------------------
 
-   procedure Enable_Clock (This : I2C_Port) is
+   procedure Enable_Clock (This : I2C_Port'Class) is
    begin
       Enable_Clock (As_Port_Id (This));
    end Enable_Clock;
@@ -408,7 +405,7 @@ package body STM32.Device is
    -- Reset --
    -----------
 
-   procedure Reset (This : I2C_Port) is
+   procedure Reset (This : I2C_Port'Class) is
    begin
       Reset (As_Port_Id (This));
    end Reset;
@@ -436,7 +433,7 @@ package body STM32.Device is
    -- Enable_Clock --
    ------------------
 
-   procedure Enable_Clock (This : SPI_Port) is
+   procedure Enable_Clock (This : SPI_Port'Class) is
    begin
       if This.Periph.all'Address = SPI1_Base then
          RCC_Periph.APB2ENR.SPI1EN := True;
@@ -459,7 +456,7 @@ package body STM32.Device is
    -- Reset --
    -----------
 
-   procedure Reset (This : SPI_Port) is
+   procedure Reset (This : SPI_Port'Class) is
    begin
       if This.Periph.all'Address = SPI1_Base then
          RCC_Periph.APB2RSTR.SPI1RST := True;
@@ -492,9 +489,15 @@ package body STM32.Device is
    begin
       if This.Periph.all'Address = SPI1_Base then
          RCC_Periph.APB2ENR.SPI1EN := True;
-      elsif This.Periph.all'Address = SPI2_Base then
+      elsif This.Periph.all'Address = SPI2_Base
+        or else
+            This.Periph.all'Address = I2S2ext_Base
+      then
          RCC_Periph.APB1ENR.SPI2EN := True;
-      elsif This.Periph.all'Address = SPI3_Base then
+      elsif This.Periph.all'Address = SPI3_Base
+        or else
+            This.Periph.all'Address = I2S3ext_Base
+      then
          RCC_Periph.APB1ENR.SPI3EN := True;
       elsif This.Periph.all'Address = SPI4_Base then
          RCC_Periph.APB2ENR.SPI5ENR := True;
@@ -516,10 +519,16 @@ package body STM32.Device is
       if This.Periph.all'Address = SPI1_Base then
          RCC_Periph.APB2RSTR.SPI1RST := True;
          RCC_Periph.APB2RSTR.SPI1RST := False;
-      elsif This.Periph.all'Address = SPI2_Base then
+      elsif This.Periph.all'Address = SPI2_Base
+        or else
+            This.Periph.all'Address = I2S2ext_Base
+      then
          RCC_Periph.APB1RSTR.SPI2RST := True;
          RCC_Periph.APB1RSTR.SPI2RST := False;
-      elsif This.Periph.all'Address = SPI3_Base then
+      elsif This.Periph.all'Address = SPI3_Base
+        or else
+            This.Periph.all'Address = I2S3ext_Base
+      then
          RCC_Periph.APB1RSTR.SPI3RST := True;
          RCC_Periph.APB1RSTR.SPI3RST := False;
       elsif This.Periph.all'Address = SPI4_Base then
@@ -865,5 +874,65 @@ package body STM32.Device is
       RCC_Periph.AHB2RSTR.DCMIRST := True;
       RCC_Periph.AHB2RSTR.DCMIRST := False;
    end Reset_DCMI;
+
+   ------------------
+   -- Enable_Clock --
+   ------------------
+
+   procedure Enable_Clock (This : in out SDMMC_Controller)
+   is
+   begin
+      if This.Periph.all'Address /= SDIO_Base then
+         raise Unknown_Device;
+      end if;
+
+      RCC_Periph.APB2ENR.SDIOEN := True;
+   end Enable_Clock;
+
+   -----------
+   -- Reset --
+   -----------
+
+   procedure Reset (This : in out SDMMC_Controller)
+   is
+   begin
+      if This.Periph.all'Address /= SDIO_Base then
+         raise Unknown_Device;
+      end if;
+
+      RCC_Periph.APB2RSTR.SDIORST := True;
+      RCC_Periph.APB2RSTR.SDIORST := False;
+   end Reset;
+
+   ------------------
+   -- Enable_Clock --
+   ------------------
+
+   procedure Enable_Clock (This : in out CRC_32) is
+      pragma Unreferenced (This);
+   begin
+      RCC_Periph.AHB1ENR.CRCEN := True;
+   end Enable_Clock;
+
+   -------------------
+   -- Disable_Clock --
+   -------------------
+
+   procedure Disable_Clock (This : in out CRC_32) is
+      pragma Unreferenced (This);
+   begin
+      RCC_Periph.AHB1ENR.CRCEN := False;
+   end Disable_Clock;
+
+   -----------
+   -- Reset --
+   -----------
+
+   procedure Reset (This : in out CRC_32) is
+      pragma Unreferenced (This);
+   begin
+      RCC_Periph.AHB1RSTR.CRCRST := True;
+      RCC_Periph.AHB1RSTR.CRCRST := False;
+   end Reset;
 
 end STM32.Device;

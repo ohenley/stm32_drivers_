@@ -45,7 +45,7 @@ with STM32.Device; use STM32.Device;
 package body STM32.I2S is
 
    function To_UInt16 is new Ada.Unchecked_Conversion (Integer_16,
-                                                       UInt16);
+                                                            UInt16);
    function To_Integer_16 is new Ada.Unchecked_Conversion (UInt16,
                                                            Integer_16);
    ---------------

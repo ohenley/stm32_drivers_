@@ -18,19 +18,17 @@ project Stm32_Drivers is
                        "src/dcmi",
                        "src/device_id",
                        "src/dma2d",
-                       --"src/dsi",
+                       "src/dma_interrupts",
                        "src/exti",
                        "src/fmc",
                        "src/gpio",
                        "src/i2s",
                        "src/iwdg",
                        "src/ltdc",
-                       "src/power_control",
                        "src/pwm",
                        "src/rng",
                        "src/rtc",
-                       --"src/sai",
-                       --"src/sd",
+                       "src/sd",
                        "src/spi",
                        "src/syscfg",
                        "src/timers");
@@ -40,7 +38,8 @@ project Stm32_Drivers is
                                                "src/stm32f4/i2c",
                                                "src/stm32f4/power_control",
                                                "src/stm32f4/stm32f42x",
-                                               "src/stm32f4/uart");
+                                               "src/stm32f4/uart",
+                                               "src/stm32f4/crc");
       when others => null;
    end case;
 

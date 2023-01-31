@@ -44,8 +44,13 @@
 
 private with STM32_SVD.SPI;
 with HAL.SPI;
+with System;
+
+with Beta_Types;
 
 package STM32.SPI is
+
+    package BT renames Beta_Types;
 
    type Internal_SPI_Port is private;
 
@@ -60,9 +65,9 @@ package STM32.SPI is
 
    type SPI_Mode is (Master, Slave);
 
-   type SPI_CLock_Polarity is (High, Low);
+   type SPI_Clock_Polarity is (High, Low);
 
-   type SPI_CLock_Phase is (P1Edge, P2Edge);
+   type SPI_Clock_Phase is (P1Edge, P2Edge);
 
    type SPI_Slave_Management is (Software_Managed, Hardware_Managed);
 
@@ -75,12 +80,12 @@ package STM32.SPI is
       Direction           : SPI_Data_Direction;
       Mode                : SPI_Mode;
       Data_Size           : HAL.SPI.SPI_Data_Size;
-      Clock_Polarity      : SPI_CLock_Polarity;
-      Clock_Phase         : SPI_CLock_Phase;
+      Clock_Polarity      : SPI_Clock_Polarity;
+      Clock_Phase         : SPI_Clock_Phase;
       Slave_Management    : SPI_Slave_Management;
       Baud_Rate_Prescaler : SPI_Baud_Rate_Prescaler;
       First_Bit           : SPI_First_Bit;
-      CRC_Poly            : UInt16;
+      CRC_Poly            : BT.UInt16;
    end record;
 
    procedure Configure (This : in out SPI_Port; Conf : SPI_Configuration);
@@ -91,14 +96,14 @@ package STM32.SPI is
 
    function Enabled (This : SPI_Port) return Boolean;
 
-   procedure Send (This : in out SPI_Port; Data : UInt16);
+   procedure Send (This : in out SPI_Port; Data : BT.UInt16);
 
-   function Data (This : SPI_Port) return UInt16
+   function Data (This : SPI_Port) return BT.UInt16
      with Inline;
 
-   procedure Send (This : in out SPI_Port; Data : UInt8);
+   procedure Send (This : in out SPI_Port; Data : BT.UInt8);
 
-   function Data (This : SPI_Port) return UInt8
+   function Data (This : SPI_Port) return BT.UInt8
      with Inline;
 
    function Is_Busy (This : SPI_Port) return Boolean
@@ -146,7 +151,7 @@ package STM32.SPI is
    --  The following I/O routines implement the higher level functionality for
    --  CRC and data direction, among others.
 
-   type Byte_Buffer is array (Natural range <>) of UInt8
+   type UInt8_Buffer is array (Natural range <>) of BT.UInt8
      with Alignment => 2;
    --  The alignment is set to 2 because we treat component pairs as half_word
    --  values when sending/receiving in 16-bit mode.
@@ -172,7 +177,7 @@ package STM32.SPI is
 
    procedure Transmit
      (This     : in out SPI_Port;
-      Outgoing : UInt8);
+      Outgoing : BT.UInt8);
 
    overriding
    procedure Receive
@@ -190,20 +195,25 @@ package STM32.SPI is
 
    procedure Receive
      (This     : in out SPI_Port;
-      Incoming : out UInt8);
+      Incoming : out BT.UInt8);
 
    procedure Transmit_Receive
      (This      : in out SPI_Port;
-      Outgoing  : Byte_Buffer;
-      Incoming  : out Byte_Buffer;
+      Outgoing  : UInt8_Buffer;
+      Incoming  : out UInt8_Buffer;
       Size      : Positive);
 
    procedure Transmit_Receive
      (This      : in out SPI_Port;
-      Outgoing  : UInt8;
-      Incoming  : out UInt8);
+      Outgoing  : BT.UInt8;
+      Incoming  : out BT.UInt8);
 
    --  TODO: add the other higher-level HAL routines for interrupts and DMA
+
+   function Data_Register_Address
+     (This : SPI_Port)
+      return System.Address;
+   --  For DMA transfer
 
 private
 
@@ -214,14 +224,14 @@ private
 
    procedure Send_Receive_16bit_Mode
      (This     : in out SPI_Port;
-      Outgoing : Byte_Buffer;
-      Incoming : out Byte_Buffer;
+      Outgoing : UInt8_Buffer;
+      Incoming : out UInt8_Buffer;
       Size     : Positive);
 
    procedure Send_Receive_8bit_Mode
      (This     : in out SPI_Port;
-      Outgoing : Byte_Buffer;
-      Incoming : out Byte_Buffer;
+      Outgoing : UInt8_Buffer;
+      Incoming : out UInt8_Buffer;
       Size     : Positive);
 
    procedure Send_16bit_Mode

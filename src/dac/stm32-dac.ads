@@ -106,7 +106,7 @@ package STM32.DAC is
      (This    : in out Digital_To_Analog_Converter;
       Channel : DAC_Channel)
      with
-       Pre => Trigger_Selection (This, Channel) = Software_Trigger and then
+       Pre => Trigger_Selection (This, Channel) = Software_Trigger and
               Trigger_Enabled (This, Channel);
    --  Cause the conversion to occur and the output to appear, per 14.3.6 "DAC
    --  trigger selection" in the RM. This routine is needed when the Software
@@ -169,7 +169,7 @@ package STM32.DAC is
       Trigger : External_Event_Trigger_Selection)
      with
        Pre  => not Trigger_Enabled (This, Channel),  -- per note in RM, pg 435
-       Post => Trigger_Selection (This, Channel) = Trigger and then
+       Post => Trigger_Selection (This, Channel) = Trigger and
                not Trigger_Enabled (This, Channel);
    --  If the software trigger is selected, output conversion starts once the
    --  channel is enabled.

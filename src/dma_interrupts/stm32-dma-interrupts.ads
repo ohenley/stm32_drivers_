@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                        Copyright (C) 2016, AdaCore                       --
+--                    Copyright (C) 2016-2018, AdaCore                      --
 --                                                                          --
 --  Redistribution and use in source and binary forms, with or without      --
 --  modification, are permitted provided that the following conditions are  --
@@ -29,11 +29,40 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package STM32.Power_Control is
+with Ada.Interrupts;
 
-   procedure Enable;
-   --  Enable power control module
+package STM32.DMA.Interrupts is
 
-   procedure Disable_Backup_Domain_Protection;
-   procedure Enable_Backup_Domain_Protection;
-end STM32.Power_Control;
+   protected type DMA_Interrupt_Controller
+     (Controller : not null access DMA_Controller;
+      Stream     : DMA_Stream_Selector;
+      ID         : Ada.Interrupts.Interrupt_ID;
+      Priority   : System.Interrupt_Priority)
+   is
+      pragma Interrupt_Priority (Priority);
+
+      procedure Start_Transfer (Source      : Address;
+                                Destination : Address;
+                                Data_Count  : UInt16);
+
+      procedure Abort_Transfer (Result : out DMA_Error_Code);
+
+      procedure Clear_Transfer_State;
+
+      function Buffer_Error return Boolean;
+
+      entry Wait_For_Completion (Status : out DMA_Error_Code);
+
+   private
+
+      procedure Interrupt_Handler;
+      pragma Attach_Handler (Interrupt_Handler, ID);
+
+      No_Transfer_In_Progess : Boolean := True;
+      Last_Status            : DMA_Error_Code := DMA_No_Error;
+      Had_Buffer_Error       : Boolean := False;
+   end DMA_Interrupt_Controller;
+
+   type DMA_Interrupt_Controller_Access is access all DMA_Interrupt_Controller;
+
+end STM32.DMA.Interrupts;

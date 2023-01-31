@@ -93,7 +93,7 @@ package body STM32.DMA2D.Interrupt is
 
       procedure Interrupt is
       begin
-         if DMA2D_Periph.ISR.CEIF or else DMA2D_Periph.ISR.TEIF then
+         if DMA2D_Periph.ISR.CEIF or DMA2D_Periph.ISR.TEIF then
             --  Conf or transfer error
             DMA2D_Periph.IFCR.CCEIF := True;
             DMA2D_Periph.IFCR.CTEIF := True;

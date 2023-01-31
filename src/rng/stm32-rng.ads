@@ -45,11 +45,7 @@
 --  See the child packages for routines to initialze the generator and acquire
 --  numbers, using either polling or interrupts.
 
-with Beta_Types;
-
 package STM32.RNG is
-
-   package BT renames Beta_Types;
 
    procedure Enable_RNG;
 
@@ -67,7 +63,7 @@ package STM32.RNG is
 
    function RNG_Interrupt_Enabled return Boolean;
 
-   function RNG_Data return BT.UInt32;
+   function RNG_Data return UInt32;
 
    function RNG_Data_Ready return Boolean;
 

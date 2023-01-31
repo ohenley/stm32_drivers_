@@ -254,8 +254,6 @@ package body STM32.DMA is
       for Selected_Interrupt in Enabled_Interrupts'Range loop
          if Enabled_Interrupts (Selected_Interrupt) then
             Enable_Interrupt (This, Stream, Selected_Interrupt);
-         else
-            Disable_Interrupt (This, Stream, Selected_Interrupt);
          end if;
       end loop;
 
@@ -704,8 +702,8 @@ package body STM32.DMA is
       Stream : DMA_Stream_Selector)
       return UInt16
    is
-      ndt : constant Unsigned_16 := Current_NDT (This, Stream);
-      items : Unsigned_16;
+      ndt : constant UInt16 := Current_NDT (This, Stream);
+      items : UInt16;
    begin
       if Operating_Mode (This, Stream) = Peripheral_Flow_Control_Mode then
          items := 16#ffff# - ndt;

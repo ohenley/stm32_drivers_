@@ -45,39 +45,38 @@
 --   COPYRIGHT(c) 2015 STMicroelectronics                                   --
 ------------------------------------------------------------------------------
 
-with Ada.Real_Time; use Ada.Real_Time;
+with Ada.Real_Time;             use Ada.Real_Time;
 
-with STM32.Device; use STM32.Device;
+with STM32.Device;              use STM32.Device;
 
-with STM32_SVD;     use STM32_SVD;
-with STM32_SVD.SAI; use STM32_SVD.SAI;
-with STM32_SVD.RCC; use STM32_SVD.RCC;
+with STM32_SVD;                 use STM32_SVD;
+with STM32_SVD.SAI;             use STM32_SVD.SAI;
+with STM32_SVD.RCC;             use STM32_SVD.RCC;
 
 package body STM32.SAI is
 
    type Block_Registers is record
       --  AConfiguration register 1
-      CR1 : ACR1_Register;
+      CR1   : ACR1_Register;
       --  AConfiguration register 2
-      CR2 : ACR2_Register;
+      CR2   : ACR2_Register;
       --  AFRCR
-      FRCR : AFRCR_Register;
+      FRCR  : AFRCR_Register;
       --  ASlot register
       SLOTR : ASLOTR_Register;
       --  AInterrupt mask register2
-      IM : AIM_Register;
+      IM    : AIM_Register;
       --  AStatus register
-      SR : ASR_Register;
+      SR    : ASR_Register;
       --  AClear flag register
       CLRFR : ACLRFR_Register;
       --  AData register
-      DR : UInt32;
-   end record with
-     Volatile;
+      DR    : UInt32;
+   end record with Volatile;
    for Block_Registers use record
-      CR1   at  0 range 0 .. 31;
-      CR2   at  4 range 0 .. 31;
-      FRCR  at  8 range 0 .. 31;
+      CR1   at 0 range 0 .. 31;
+      CR2   at 4 range 0 .. 31;
+      FRCR  at 8 range 0 .. 31;
       SLOTR at 12 range 0 .. 31;
       IM    at 16 range 0 .. 31;
       SR    at 20 range 0 .. 31;
@@ -87,20 +86,21 @@ package body STM32.SAI is
    type Block_Registers_Access is access all Block_Registers;
 
    function Get_Block
-     (Periph : SAI_Controller; Block : SAI_Block)
-      return Block_Registers_Access;
+     (Periph : SAI_Controller;
+      Block  : SAI_Block) return Block_Registers_Access;
 
    ---------------
    -- Get_Block --
    ---------------
 
    function Get_Block
-     (Periph : SAI_Controller; Block : SAI_Block) return Block_Registers_Access
+     (Periph : SAI_Controller;
+      Block  : SAI_Block) return Block_Registers_Access
    is
-      BlockA : aliased Block_Registers with
-        Volatile, Import, Address => Periph.ACR1'Address;
-      BlockB : aliased Block_Registers with
-        Volatile, Import, Address => Periph.BCR1'Address;
+      BlockA : aliased Block_Registers
+        with Volatile, Import, Address => Periph.ACR1'Address;
+      BlockB : aliased Block_Registers
+        with Volatile, Import, Address => Periph.BCR1'Address;
    begin
       case Block is
          when Block_A =>
@@ -114,8 +114,12 @@ package body STM32.SAI is
    -- Deinitialize --
    ------------------
 
-   procedure Deinitialize (This : SAI_Controller; Block : SAI_Block) is
-      Block_Regs : constant Block_Registers_Access := Get_Block (This, Block);
+   procedure Deinitialize
+     (This : SAI_Controller;
+      Block  : SAI_Block)
+   is
+      Block_Regs : constant Block_Registers_Access :=
+                     Get_Block (This, Block);
       Start      : Time;
    begin
       --  Disable SAI
@@ -129,9 +133,11 @@ package body STM32.SAI is
       end loop;
 
       --  Reset the SAI block interrupts
-      Block_Regs.IM    := (others => <>);
+      Block_Regs.IM := (others => <>);
       Block_Regs.CLRFR :=
-        (Reserved_3_3 => 0, Reserved_7_31 => 0, others => True);
+        (Reserved_3_3 => 0,
+         Reserved_7_31 => 0,
+         others        => True);
       --  Flush the FIFO
       Block_Regs.CR2.FFLUS := True;
    end Deinitialize;
@@ -140,9 +146,11 @@ package body STM32.SAI is
    -- Enabled --
    -------------
 
-   function Enabled (This : SAI_Controller; Block : SAI_Block) return Boolean
+   function Enabled (This : SAI_Controller;
+                     Block  : SAI_Block) return Boolean
    is
-      Block_Regs : constant Block_Registers_Access := Get_Block (This, Block);
+      Block_Regs : constant Block_Registers_Access :=
+                     Get_Block (This, Block);
    begin
       return Block_Regs.CR1.SAIAEN;
    end Enabled;
@@ -151,8 +159,12 @@ package body STM32.SAI is
    -- Enable --
    ------------
 
-   procedure Enable (This : SAI_Controller; Block : SAI_Block) is
-      Block_Regs : constant Block_Registers_Access := Get_Block (This, Block);
+   procedure Enable
+     (This : SAI_Controller;
+      Block  : SAI_Block)
+   is
+      Block_Regs : constant Block_Registers_Access :=
+                     Get_Block (This, Block);
    begin
       Block_Regs.CR1.SAIAEN := True;
    end Enable;
@@ -161,8 +173,12 @@ package body STM32.SAI is
    -- Disable --
    -------------
 
-   procedure Disable (This : SAI_Controller; Block : SAI_Block) is
-      Block_Regs : constant Block_Registers_Access := Get_Block (This, Block);
+   procedure Disable
+     (This : SAI_Controller;
+      Block  : SAI_Block)
+   is
+      Block_Regs : constant Block_Registers_Access :=
+                     Get_Block (This, Block);
    begin
       Block_Regs.CR1.SAIAEN := False;
    end Disable;
@@ -171,8 +187,12 @@ package body STM32.SAI is
    -- Enable_DMA --
    ----------------
 
-   procedure Enable_DMA (This : SAI_Controller; Block : SAI_Block) is
-      Block_Regs : constant Block_Registers_Access := Get_Block (This, Block);
+   procedure Enable_DMA
+     (This : SAI_Controller;
+      Block  : SAI_Block)
+   is
+      Block_Regs : constant Block_Registers_Access :=
+                     Get_Block (This, Block);
    begin
       Block_Regs.CR1.DMAEN := True;
    end Enable_DMA;
@@ -181,8 +201,12 @@ package body STM32.SAI is
    -- DMA_Pause --
    ---------------
 
-   procedure DMA_Pause (This : SAI_Controller; Block : SAI_Block) is
-      Block_Regs : constant Block_Registers_Access := Get_Block (This, Block);
+   procedure DMA_Pause
+     (This  : SAI_Controller;
+      Block : SAI_Block)
+   is
+      Block_Regs : constant Block_Registers_Access :=
+                     Get_Block (This, Block);
    begin
       Block_Regs.CR1.DMAEN := False;
    end DMA_Pause;
@@ -191,8 +215,12 @@ package body STM32.SAI is
    -- DMA_Resume --
    ----------------
 
-   procedure DMA_Resume (This : SAI_Controller; Block : SAI_Block) is
-      Block_Regs : constant Block_Registers_Access := Get_Block (This, Block);
+   procedure DMA_Resume
+     (This  : SAI_Controller;
+      Block : SAI_Block)
+   is
+      Block_Regs : constant Block_Registers_Access :=
+                     Get_Block (This, Block);
    begin
       Block_Regs.CR1.DMAEN := True;
 
@@ -205,8 +233,12 @@ package body STM32.SAI is
    -- DMA_Stop --
    --------------
 
-   procedure DMA_Stop (This : SAI_Controller; Block : SAI_Block) is
-      Block_Regs : constant Block_Registers_Access := Get_Block (This, Block);
+   procedure DMA_Stop
+     (This  : SAI_Controller;
+      Block : SAI_Block)
+   is
+      Block_Regs : constant Block_Registers_Access :=
+                     Get_Block (This, Block);
    begin
       Block_Regs.CR1.DMAEN := False;
       Disable (This, Block);
@@ -217,15 +249,21 @@ package body STM32.SAI is
    ---------------------------
 
    procedure Configure_Audio_Block
-     (This            : SAI_Controller; Block : SAI_Block;
-      Frequency : SAI_Audio_Frequency; Stereo_Mode : SAI_Mono_Stereo_Mode;
-      Mode            : SAI_Audio_Mode; MCD_Enabled : Boolean;
-      Protocol        : SAI_Protocol_Configuration; Data_Size : SAI_Data_Size;
-      Endianness : SAI_Endianness; Clock_Strobing : SAI_Clock_Strobing_Edge;
-      Synchronization : SAI_Synchronization; Output_Drive : SAI_Output_Drive;
+     (This          : SAI_Controller;
+      Block           : SAI_Block;
+      Frequency       : SAI_Audio_Frequency;
+      Stereo_Mode     : SAI_Mono_Stereo_Mode;
+      Mode            : SAI_Audio_Mode;
+      MCD_Enabled     : Boolean;
+      Protocol        : SAI_Protocol_Configuration;
+      Data_Size       : SAI_Data_Size;
+      Endianness      : SAI_Endianness;
+      Clock_Strobing  : SAI_Clock_Strobing_Edge;
+      Synchronization : SAI_Synchronization;
+      Output_Drive    : SAI_Output_Drive;
       FIFO_Threshold  : SAI_FIFO_Threshold;
       Tristate_Mgt    : SAI_Tristate_Management := SD_Line_Driven;
-      Companding_Mode : SAI_Companding_Mode     := No_Companding)
+      Companding_Mode : SAI_Companding_Mode := No_Companding)
    is
       Block_Reg : constant Block_Registers_Access := Get_Block (This, Block);
       Freq      : UInt32;
@@ -242,7 +280,7 @@ package body STM32.SAI is
 
       --  Calculate *10 to keep some precision
       Tmp_Clock := Freq * 10 / (Frequency * 512);
-      Mckdiv    := Tmp_Clock / 10;
+      Mckdiv := Tmp_Clock / 10;
 
       --  Round the result if needed
       if (Tmp_Clock mod 10) > 8 then
@@ -256,9 +294,13 @@ package body STM32.SAI is
          LSBFIRST => Endianness = Data_LSB_First,
          CKSTR    => Clock_Strobing = Clock_Strobing_Rising_Edge,
          SYNCEN   => SAI_Synchronization'Enum_Rep (Synchronization),
-         MONO => Stereo_Mode = Mono, OutDri => Output_Drive = Drive_Immediate,
-         SAIAEN   => False, DMAEN => False, NODIV => not MCD_Enabled,
-         MCJDIV   => UInt4 (Mckdiv), others => <>);
+         MONO     => Stereo_Mode = Mono,
+         OutDri   => Output_Drive = Drive_Immediate,
+         SAIAEN   => False,
+         DMAEN    => False,
+         NODIV    => not MCD_Enabled,
+         MCJDIV   => UInt4 (Mckdiv),
+         others   => <>);
       Block_Reg.CR2.FTH   := SAI_FIFO_Threshold'Enum_Rep (FIFO_Threshold);
       Block_Reg.CR2.FFLUS := False;
       Block_Reg.CR2.TRIS  := Tristate_Mgt = SD_Line_Released;
@@ -270,17 +312,23 @@ package body STM32.SAI is
    ---------------------------
 
    procedure Configure_Block_Frame
-     (This         : SAI_Controller; Block : SAI_Block; Frame_Length : UInt8;
-      Frame_Active : UInt7; Frame_Sync : SAI_Frame_Synchronization;
-      FS_Polarity : SAI_Frame_Sync_Polarity; FS_Offset : SAI_Frame_Sync_Offset)
+     (This       : SAI_Controller;
+      Block        : SAI_Block;
+      Frame_Length : UInt8;
+      Frame_Active : UInt7;
+      Frame_Sync   : SAI_Frame_Synchronization;
+      FS_Polarity  : SAI_Frame_Sync_Polarity;
+      FS_Offset    : SAI_Frame_Sync_Offset)
    is
       Block_Reg : constant Block_Registers_Access := Get_Block (This, Block);
    begin
       Block_Reg.FRCR :=
-        (FRL   => Frame_Length - 1, FSALL => Frame_Active - 1,
+        (FRL   => Frame_Length - 1,
+         FSALL => Frame_Active - 1,
          FSDEF => Frame_Sync = FS_Frame_And_Channel_Identification,
          FSPOL => FS_Polarity = FS_Active_High,
-         FSOFF => FS_Offset = Before_First_Bit, others => <>);
+         FSOFF => FS_Offset = Before_First_Bit,
+         others => <>);
    end Configure_Block_Frame;
 
    --------------------------
@@ -288,9 +336,12 @@ package body STM32.SAI is
    --------------------------
 
    procedure Configure_Block_Slot
-     (This : SAI_Controller; Block : SAI_Block; First_Bit_Offset : UInt5;
-      Slot_Size     : SAI_Slot_Size; Number_Of_Slots : Slots_Number;
-      Enabled_Slots : SAI_Slots)
+     (This           : SAI_Controller;
+      Block            : SAI_Block;
+      First_Bit_Offset : UInt5;
+      Slot_Size        : SAI_Slot_Size;
+      Number_Of_Slots  : Slots_Number;
+      Enabled_Slots    : SAI_Slots)
    is
       Block_Reg : constant Block_Registers_Access := Get_Block (This, Block);
    begin
@@ -298,7 +349,8 @@ package body STM32.SAI is
         (FBOFF  => First_Bit_Offset,
          SLOTSZ => SAI_Slot_Size'Enum_Rep (Slot_Size),
          NBSLOT => UInt4 (Number_Of_Slots - 1),
-         SLOTEN => UInt16 (Enabled_Slots), others => <>);
+         SLOTEN => UInt16 (Enabled_Slots),
+         others => <>);
    end Configure_Block_Slot;
 
 end STM32.SAI;

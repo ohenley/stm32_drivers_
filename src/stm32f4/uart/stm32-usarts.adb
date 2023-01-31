@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 --                                                                          --
---                  Copyright (C) 2015-2016, AdaCore                        --
+--                  Copyright (C) 2015-2017, AdaCore                        --
 --                                                                          --
 --  Redistribution and use in source and binary forms, with or without      --
 --  modification, are permitted provided that the following conditions are  --
@@ -54,7 +54,7 @@ package body STM32.USARTs is
       Clocks : constant RCC_System_Clocks := System_Clock_Frequencies;
    begin
       if This.Periph.all'Address = USART1_Base
-        or else
+        or
          This.Periph.all'Address = USART6_Base
       then
          return Clocks.PCLK2;
@@ -421,7 +421,7 @@ package body STM32.USARTs is
 
    procedure Disable_DMA_Receive_Requests (This : in out USART) is
    begin
-      This.Periph.CR3.DMAR := True;
+      This.Periph.CR3.DMAR := False;
    end Disable_DMA_Receive_Requests;
 
    -----------------------------------

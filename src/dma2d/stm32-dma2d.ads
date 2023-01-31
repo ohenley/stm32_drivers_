@@ -138,7 +138,7 @@ package STM32.DMA2D is
    subtype Background_Color_Mode is DMA2D_Color_Mode;
    subtype Output_Color_Mode is DMA2D_Color_Mode range ARGB8888 .. ARGB4444;
 
---     function Bytes_Per_Pixel (CM : DMA2D_Color_Mode) return Positive
+--     function UInt8s_Per_Pixel (CM : DMA2D_Color_Mode) return Positive
 --     is (case CM is
 --            when ARGB8888 => 4,
 --            when RGB888 => 3,
@@ -269,8 +269,7 @@ package STM32.DMA2D is
      with Pre => Buffer.Color_Mode in Output_Color_Mode;
    --  Draws a vertical line
 
-   procedure DMA2D_Wait_Transfer
-     with Inline_Always;
+   procedure DMA2D_Wait_Transfer;
    --  Makes sure the DMA2D transfers are done
 
 private

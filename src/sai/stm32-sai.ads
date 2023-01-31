@@ -54,46 +54,66 @@ package STM32.SAI is
 
    subtype SAI_Audio_Frequency is UInt32;
 
-   type SAI_Mono_Stereo_Mode is (Stereo, Mono) with
-     Size => 1;
+   type SAI_Mono_Stereo_Mode is
+     (Stereo,
+      Mono)
+     with Size => 1;
 
    type SAI_Audio_Mode is
-     (Master_Transmitter, Master_Receiver, Slave_Transmitter,
-      Slave_Receiver) with
-     Size => 2;
+     (Master_Transmitter,
+      Master_Receiver,
+      Slave_Transmitter,
+      Slave_Receiver)
+     with Size => 2;
    --  When the audio mode is configured in SPDIF mode, the master transmitter
    --  mode is forced. In Master transmitter mode, the audio block starts
    --  generating the FS and the clocks immediately.
 
    type SAI_Protocol_Configuration is
-     (Free_Protocol, SPDIF_Protocol, AC97_Protocol) with
-     Size => 2;
+     (Free_Protocol,
+      SPDIF_Protocol,
+      AC97_Protocol)
+     with Size => 2;
    --  The Free protocol allows to use the powerful configuration of the
    --  audio block to address a specific audio protocol (such as I2S, LSB/MSB
    --  justified, TDM, PCM/DSP...) by setting most of the configuration
    --  register bits as well as frame configuration register.
 
    for SAI_Protocol_Configuration use
-     (Free_Protocol => 0, SPDIF_Protocol => 1, AC97_Protocol => 2);
+     (Free_Protocol  => 0,
+      SPDIF_Protocol => 1,
+      AC97_Protocol  => 2);
 
    type SAI_Data_Size is
-     (Data_8b, Data_10b, Data_16b, Data_20b, Data_24b, Data_32b) with
-     Size => 3;
+     (Data_8b,
+      Data_10b,
+      Data_16b,
+      Data_20b,
+      Data_24b,
+      Data_32b)
+     with Size => 3;
    --  These bits are ignored when the SPDIF protocols are selected (bit
    --  PRTCFG[1:0]), because the frame and the data size are fixed in such
    --  case. When the companding mode is selected through COMP[1:0] bits,
    --  DS[1:0] are ignored since the data size is fixed to 8 bits by the
    --  algorithm.
    for SAI_Data_Size use
-     (Data_8b => 2, Data_10b => 3, Data_16b => 4, Data_20b => 5, Data_24b => 6,
+     (Data_8b  => 2,
+      Data_10b => 3,
+      Data_16b => 4,
+      Data_20b => 5,
+      Data_24b => 6,
       Data_32b => 7);
 
-   type SAI_Endianness is (Data_MSB_First, Data_LSB_First) with
-     Size => 1;
+   type SAI_Endianness is
+     (Data_MSB_First,
+      Data_LSB_First)
+     with Size => 1;
 
    type SAI_Clock_Strobing_Edge is
-     (Clock_Strobing_Falling_Edge, Clock_Strobing_Rising_Edge) with
-     Size => 1;
+     (Clock_Strobing_Falling_Edge,
+      Clock_Strobing_Rising_Edge)
+     with Size => 1;
    --  This has no meanings in SPDIF audio mode,
    --
    --  Clock_Strobing_Falling_Edge:
@@ -105,8 +125,10 @@ package STM32.SAI is
    --  received by the SAI are sampled on the SCK rising edge.
 
    type SAI_Synchronization is
-     (Asynchronous_Mode, Synchronous_Mode, Synchronous_Ext_Mode) with
-     Size => 2;
+     (Asynchronous_Mode,
+      Synchronous_Mode,
+      Synchronous_Ext_Mode)
+     with Size => 2;
    --  Asynchronous_Mode:
    --  audio sub-block in asynchronous mode.
    --  Synchronous_Mode:
@@ -116,10 +138,13 @@ package STM32.SAI is
    --  audio sub-block is synchronous with an external SAI embedded peripheral.
    --  In this case the audio sub-block should be configured in Slave mode.
 
-   type SAI_Output_Drive is (Drive_On_SAI_Enabled, Drive_Immediate) with
-     Size => 1;
+   type SAI_Output_Drive is
+     (Drive_On_SAI_Enabled,
+      Drive_Immediate)
+     with Size => 1;
    --  To be set before enabling the Audio Block and after the audio block
    --  configuration
+
 
    type SAI_Master_Clock_Divider is new UInt4;
    --  Meaningless when the audio block operates in slave mode. They have to be
@@ -130,11 +155,16 @@ package STM32.SAI is
    --    F_SCK = F_SAI_CK / (Master_Clock_Divider x 2)
 
    type SAI_FIFO_Threshold is
-     (FIFO_Empty, FIFO_1_Quarter_Full, FIFO_Half_Full, FIFO_3_Quarters_Full,
-      FIFO_Full) with
-     Size => 3;
+     (FIFO_Empty,
+      FIFO_1_Quarter_Full,
+      FIFO_Half_Full,
+      FIFO_3_Quarters_Full,
+      FIFO_Full)
+     with Size => 3;
 
-   type SAI_Tristate_Management is (SD_Line_Driven, SD_Line_Released);
+   type SAI_Tristate_Management is
+     (SD_Line_Driven,
+      SD_Line_Released);
    --  Meaningful only if the audio block is configured as a transmitter. This
    --  bit is not used when the audio block is configured in SPDIF mode. It
    --  should be configured when SAI is disabled.
@@ -145,7 +175,9 @@ package STM32.SAI is
    --  last active slot if the next one is inactive.
 
    type SAI_Companding_Mode is
-     (No_Companding, M_Law_Algorithm, A_Law_Algorithm);
+     (No_Companding,
+      M_Law_Algorithm,
+      A_Law_Algorithm);
    --  Telecommunication applications can require to process the data to be
    --  transmitted or received using a data companding algorithm. The two
    --  companding modes supported are the μ-Law and the A-Law log which are
@@ -153,8 +185,9 @@ package STM32.SAI is
    --
 
    type SAI_Frame_Synchronization is
-     (FS_Frame, FS_Frame_And_Channel_Identification) with
-     Size => 1;
+     (FS_Frame,
+      FS_Frame_And_Channel_Identification)
+     with Size => 1;
    --  Meaningless and is not used in AC’97 or SPDIF audio block
    --  configuration. It must be configured when the audio block is disabled.
    --
@@ -168,8 +201,10 @@ package STM32.SAI is
    --  FS_Frame_And_Channel_Identification: FS signal is a start of frame
    --    signal + channel side identification.
 
-   type SAI_Frame_Sync_Polarity is (FS_Active_Low, FS_Active_High) with
-     Size => 1;
+   type SAI_Frame_Sync_Polarity is
+     (FS_Active_Low,
+      FS_Active_High)
+     with Size => 1;
    --  It is used to configure the level of the start of frame on the FS
    --  signal. It is meaningless and is not used in AC’97 or SPDIF audio
    --  block configuration.
@@ -177,8 +212,10 @@ package STM32.SAI is
    --  FS_Active_Low: FS is active low (falling edge)
    --  FS_Active_High: FS is active high (rising edge)
 
-   type SAI_Frame_Sync_Offset is (First_Bit, Before_First_Bit) with
-     Size => 1;
+   type SAI_Frame_Sync_Offset is
+     (First_Bit,
+      Before_First_Bit)
+     with Size => 1;
    --  Meaningless and is not used in AC’97 or SPDIF audio block
    --  configuration. This bit must be configured when the audio block
    --  is disabled.
@@ -186,8 +223,11 @@ package STM32.SAI is
    --  Before_First_Bit: FS is asserted one bit before the first bit of the
    --    slot 0.
 
-   type SAI_Slot_Size is (Data_Size, Slot_16b, Slot_32b) with
-     Size => 2;
+   type SAI_Slot_Size is
+     (Data_Size,
+      Slot_16b,
+      Slot_32b)
+     with Size => 2;
    --  The slot size must be higher or equal to the data size. If this
    --  condition is not respected, the behavior of the SAI will be
    --  undetermined.
@@ -199,67 +239,94 @@ package STM32.SAI is
 
    type SAI_Slots is new UInt16;
 
-   Slot_0  : constant SAI_Slots := 2**0;
-   Slot_1  : constant SAI_Slots := 2**1;
-   Slot_2  : constant SAI_Slots := 2**2;
-   Slot_3  : constant SAI_Slots := 2**3;
-   Slot_4  : constant SAI_Slots := 2**4;
-   Slot_5  : constant SAI_Slots := 2**5;
-   Slot_6  : constant SAI_Slots := 2**6;
-   Slot_7  : constant SAI_Slots := 2**7;
-   Slot_8  : constant SAI_Slots := 2**8;
-   Slot_9  : constant SAI_Slots := 2**9;
-   Slot_10 : constant SAI_Slots := 2**10;
-   Slot_11 : constant SAI_Slots := 2**11;
-   Slot_12 : constant SAI_Slots := 2**12;
-   Slot_13 : constant SAI_Slots := 2**13;
-   Slot_14 : constant SAI_Slots := 2**14;
-   Slot_15 : constant SAI_Slots := 2**15;
+   Slot_0  : constant SAI_Slots := 2 ** 0;
+   Slot_1  : constant SAI_Slots := 2 ** 1;
+   Slot_2  : constant SAI_Slots := 2 ** 2;
+   Slot_3  : constant SAI_Slots := 2 ** 3;
+   Slot_4  : constant SAI_Slots := 2 ** 4;
+   Slot_5  : constant SAI_Slots := 2 ** 5;
+   Slot_6  : constant SAI_Slots := 2 ** 6;
+   Slot_7  : constant SAI_Slots := 2 ** 7;
+   Slot_8  : constant SAI_Slots := 2 ** 8;
+   Slot_9  : constant SAI_Slots := 2 ** 9;
+   Slot_10 : constant SAI_Slots := 2 ** 10;
+   Slot_11 : constant SAI_Slots := 2 ** 11;
+   Slot_12 : constant SAI_Slots := 2 ** 12;
+   Slot_13 : constant SAI_Slots := 2 ** 13;
+   Slot_14 : constant SAI_Slots := 2 ** 14;
+   Slot_15 : constant SAI_Slots := 2 ** 15;
 
-   procedure Deinitialize (This : SAI_Controller; Block : SAI_Block);
+   procedure Deinitialize
+     (This  : SAI_Controller;
+      Block : SAI_Block);
 
    function Enabled
-     (This : SAI_Controller; Block : SAI_Block) return Boolean with
-     Inline;
+     (This  : SAI_Controller;
+      Block : SAI_Block) return Boolean
+     with Inline;
 
-   procedure Enable (This : SAI_Controller; Block : SAI_Block) with
-     Inline;
+   procedure Enable
+     (This  : SAI_Controller;
+      Block : SAI_Block)
+     with Inline;
 
-   procedure Disable (This : SAI_Controller; Block : SAI_Block) with
-     Inline;
+   procedure Disable
+     (This  : SAI_Controller;
+      Block : SAI_Block)
+     with Inline;
 
-   procedure Enable_DMA (This : SAI_Controller; Block : SAI_Block) with
-     Inline;
+   procedure Enable_DMA
+     (This  : SAI_Controller;
+      Block : SAI_Block)
+     with Inline;
 
-   procedure DMA_Pause (This : SAI_Controller; Block : SAI_Block) with
-     Inline;
+   procedure DMA_Pause
+     (This  : SAI_Controller;
+      Block : SAI_Block)
+     with Inline;
 
-   procedure DMA_Resume (This : SAI_Controller; Block : SAI_Block) with
-     Inline;
+   procedure DMA_Resume
+     (This  : SAI_Controller;
+      Block : SAI_Block)
+     with Inline;
 
-   procedure DMA_Stop (This : SAI_Controller; Block : SAI_Block) with
-     Inline;
+   procedure DMA_Stop
+     (This  : SAI_Controller;
+      Block : SAI_Block)
+     with Inline;
 
    procedure Configure_Audio_Block
-     (This            : SAI_Controller; Block : SAI_Block;
-      Frequency : SAI_Audio_Frequency; Stereo_Mode : SAI_Mono_Stereo_Mode;
-      Mode            : SAI_Audio_Mode; MCD_Enabled : Boolean;
-      Protocol        : SAI_Protocol_Configuration; Data_Size : SAI_Data_Size;
-      Endianness : SAI_Endianness; Clock_Strobing : SAI_Clock_Strobing_Edge;
-      Synchronization : SAI_Synchronization; Output_Drive : SAI_Output_Drive;
+     (This            : SAI_Controller;
+      Block           : SAI_Block;
+      Frequency       : SAI_Audio_Frequency;
+      Stereo_Mode     : SAI_Mono_Stereo_Mode;
+      Mode            : SAI_Audio_Mode;
+      MCD_Enabled     : Boolean;
+      Protocol        : SAI_Protocol_Configuration;
+      Data_Size       : SAI_Data_Size;
+      Endianness      : SAI_Endianness;
+      Clock_Strobing  : SAI_Clock_Strobing_Edge;
+      Synchronization : SAI_Synchronization;
+      Output_Drive    : SAI_Output_Drive;
       FIFO_Threshold  : SAI_FIFO_Threshold;
       Tristate_Mgt    : SAI_Tristate_Management := SD_Line_Driven;
-      Companding_Mode : SAI_Companding_Mode     := No_Companding);
+      Companding_Mode : SAI_Companding_Mode := No_Companding);
 
    procedure Configure_Block_Frame
-     (This         : SAI_Controller; Block : SAI_Block; Frame_Length : UInt8;
-      Frame_Active : UInt7; Frame_Sync : SAI_Frame_Synchronization;
-      FS_Polarity  : SAI_Frame_Sync_Polarity;
-      FS_Offset    : SAI_Frame_Sync_Offset);
+     (This            : SAI_Controller;
+      Block           : SAI_Block;
+      Frame_Length    : UInt8;
+      Frame_Active    : UInt7;
+      Frame_Sync      : SAI_Frame_Synchronization;
+      FS_Polarity     : SAI_Frame_Sync_Polarity;
+      FS_Offset       : SAI_Frame_Sync_Offset);
 
    procedure Configure_Block_Slot
-     (This : SAI_Controller; Block : SAI_Block; First_Bit_Offset : UInt5;
-      Slot_Size     : SAI_Slot_Size; Number_Of_Slots : Slots_Number;
-      Enabled_Slots : SAI_Slots);
+     (This             : SAI_Controller;
+      Block            : SAI_Block;
+      First_Bit_Offset : UInt5;
+      Slot_Size        : SAI_Slot_Size;
+      Number_Of_Slots  : Slots_Number;
+      Enabled_Slots    : SAI_Slots);
 
 end STM32.SAI;

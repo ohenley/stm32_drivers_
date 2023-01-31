@@ -43,7 +43,7 @@ with Ada.Interrupts.Names;
 
 package body STM32.RNG.Interrupts is
 
-   type Buffer_Content is array (Integer range <>) of BT.UInt32;
+   type Buffer_Content is array (Integer range <>) of UInt32;
 
    type Ring_Buffer is record
       Content : Buffer_Content (0 .. 9);
@@ -57,17 +57,18 @@ package body STM32.RNG.Interrupts is
 
    protected Receiver is
       pragma Interrupt_Priority;
-      entry Get_Random_32 (Value : out BT.UInt32);
+      entry Get_Random_32 (Value : out UInt32);
    private
 
-      Last           : BT.UInt32 := 0;
+      Last           : UInt32 := 0;
       Buffer         : Ring_Buffer;
-      Data_Available : Boolean   := False;
+      Data_Available : Boolean := False;
 
       procedure Interrupt_Handler;
 
       pragma Attach_Handler
-        (Interrupt_Handler, Ada.Interrupts.Names.HASH_RNG_Interrupt);
+        (Interrupt_Handler,
+         Ada.Interrupts.Names.HASH_RNG_Interrupt);
 
    end Receiver;
 
@@ -81,12 +82,12 @@ package body STM32.RNG.Interrupts is
       -- Get_Random_32 --
       -------------------
 
-      entry Get_Random_32 (Value : out BT.UInt32) when Data_Available is
+      entry Get_Random_32 (Value : out UInt32) when Data_Available is
          Next : constant Integer :=
            (Buffer.Tail + 1) mod Buffer.Content'Length;
       begin
          --  Remove an item from our ring buffer.
-         Value       := Buffer.Content (Next);
+         Value := Buffer.Content (Next);
          Buffer.Tail := Next;
 
          --  If the buffer is empty, make sure we block subsequent callers
@@ -103,7 +104,7 @@ package body STM32.RNG.Interrupts is
       -----------------------
 
       procedure Interrupt_Handler is
-         Current : BT.UInt32;
+         Current : UInt32;
       begin
          if RNG_Seed_Error_Status then
             Clear_RNG_Seed_Error_Status;
@@ -135,7 +136,7 @@ package body STM32.RNG.Interrupts is
                   Buffer.Content (Buffer.Head) := Current;
 
                   Data_Available := True;
-                  Last           := Current;
+                  Last := Current;
                end if;
             end if;
          end if;
@@ -148,7 +149,7 @@ package body STM32.RNG.Interrupts is
    --------------------
 
    procedure Initialize_RNG is
-      Discard : BT.UInt32;
+      Discard : UInt32;
    begin
       Enable_RNG_Clock;
       Enable_RNG_Interrupt;
@@ -163,8 +164,8 @@ package body STM32.RNG.Interrupts is
    -- Random --
    ------------
 
-   function Random return BT.UInt32 is
-      Result : BT.UInt32;
+   function Random return UInt32 is
+      Result : UInt32;
    begin
       Receiver.Get_Random_32 (Result);
       return Result;

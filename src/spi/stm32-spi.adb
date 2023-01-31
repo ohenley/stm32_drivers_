@@ -40,7 +40,6 @@
 ------------------------------------------------------------------------------
 
 with Ada.Unchecked_Conversion;
-with System;
 
 with STM32_SVD.SPI; use STM32_SVD.SPI;
 
@@ -48,7 +47,7 @@ package body STM32.SPI is
 
    use type HAL.SPI.SPI_Data_Size;
 
-   Baud_Rate_Value : constant array (SPI_Baud_Rate_Prescaler) of UInt3 :=
+   Baud_Rate_Value : constant array (SPI_Baud_Rate_Prescaler) of BT.UInt3 :=
      (BRP_2   => 2#000#,
       BRP_4   => 2#001#,
       BRP_8   => 2#010#,
@@ -58,12 +57,12 @@ package body STM32.SPI is
       BRP_128 => 2#110#,
       BRP_256 => 2#111#);
 
-   type Half_Word_Pointer is access all UInt16
+   type Half_Word_Pointer is access all BT.UInt16
      with Storage_Size => 0;
 
    function As_Half_Word_Pointer is new Ada.Unchecked_Conversion
      (Source => System.Address, Target => Half_Word_Pointer);
-   --  So that we can treat the address of a byte as a pointer to a two-byte
+   --  So that we can treat the address of a BT.UInt8 as a pointer to a two-BT.UInt8
    --  sequence representing a Half_Word quantity
 
    ---------------
@@ -144,7 +143,7 @@ package body STM32.SPI is
    -- Send --
    ----------
 
-   procedure Send (This : in out SPI_Port; Data : UInt16) is
+   procedure Send (This : in out SPI_Port; Data : BT.UInt16) is
    begin
       This.Periph.DR.DR := Data;
    end Send;
@@ -153,7 +152,7 @@ package body STM32.SPI is
    -- Data --
    ----------
 
-   function Data (This : SPI_Port) return UInt16 is
+   function Data (This : SPI_Port) return BT.UInt16 is
    begin
       return This.Periph.DR.DR;
    end Data;
@@ -162,18 +161,18 @@ package body STM32.SPI is
    -- Send --
    ----------
 
-   procedure Send (This : in out SPI_Port; Data : UInt8) is
+   procedure Send (This : in out SPI_Port; Data : BT.UInt8) is
    begin
-      Send (This, UInt16 (Data));
+      Send (This, BT.UInt16 (Data));
    end Send;
 
    ----------
    -- Data --
    ----------
 
-   function Data (This : SPI_Port) return UInt8 is
+   function Data (This : SPI_Port) return BT.UInt8 is
    begin
-      return UInt8 (UInt16'(Data (This)));
+      return BT.UInt8 (BT.UInt16'(Data (This)));
    end Data;
 
    -------------
@@ -220,7 +219,7 @@ package body STM32.SPI is
 
    function Current_Mode (This : SPI_Port) return SPI_Mode is
    begin
-      if This.Periph.CR1.MSTR and then This.Periph.CR1.SSI then
+      if This.Periph.CR1.MSTR and This.Periph.CR1.SSI then
          return Master;
       else
          return Slave;
@@ -305,7 +304,7 @@ package body STM32.SPI is
    -------------------
 
    procedure Clear_Overrun (This : SPI_Port) is
-      Dummy1 : UInt16;
+      Dummy1 : BT.UInt16;
       Dummy2 : SR_Register;
    begin
       Dummy1 := This.Periph.DR.DR;
@@ -383,7 +382,7 @@ package body STM32.SPI is
          null;
       end loop;
 
-      --  Clear OVERUN flag in 2-Line communication mode because received byte
+      --  Clear OVERUN flag in 2-Line communication mode because received BT.UInt8
       --  is not read.
       if Current_Data_Direction (This) in D2Lines_RxOnly | D2Lines_FullDuplex
       then  -- right comparison ???
@@ -432,7 +431,7 @@ package body STM32.SPI is
          null;
       end loop;
 
-      --  Clear OVERUN flag in 2-Line communication mode because received byte
+      --  Clear OVERUN flag in 2-Line communication mode because received BT.UInt8
       --  is not read.
       if Current_Data_Direction (This) in D2Lines_RxOnly | D2Lines_FullDuplex
       then  -- right comparison ???
@@ -448,7 +447,7 @@ package body STM32.SPI is
 
    procedure Transmit
      (This     : in out SPI_Port;
-      Outgoing : UInt8)
+      Outgoing : BT.UInt8)
    is
    begin
       if CRC_Enabled (This) then
@@ -464,7 +463,7 @@ package body STM32.SPI is
          Enable (This);
       end if;
 
-      This.Periph.DR.DR := UInt16 (Outgoing);
+      This.Periph.DR.DR := BT.UInt16 (Outgoing);
 
       while not Tx_Is_Empty (This) loop
          null;
@@ -474,7 +473,7 @@ package body STM32.SPI is
          null;
       end loop;
 
-      --  Clear OVERUN flag in 2-Line communication mode because received byte
+      --  Clear OVERUN flag in 2-Line communication mode because received BT.UInt8
       --  is not read.
       if Current_Data_Direction (This) in D2Lines_RxOnly | D2Lines_FullDuplex
       then  -- right comparison ???
@@ -509,7 +508,7 @@ package body STM32.SPI is
          null;
       end loop;
 
-      if CRC_Enabled (This) and then CRC_Error_Indicated (This) then
+      if CRC_Enabled (This) and CRC_Error_Indicated (This) then
          Reset_CRC (This);
          Status := HAL.SPI.Err_Error;
       end if;
@@ -543,7 +542,7 @@ package body STM32.SPI is
          null;
       end loop;
 
-      if CRC_Enabled (This) and then CRC_Error_Indicated (This) then
+      if CRC_Enabled (This) and CRC_Error_Indicated (This) then
          Reset_CRC (This);
          Status := HAL.SPI.Err_Error;
       end if;
@@ -556,7 +555,7 @@ package body STM32.SPI is
 
    procedure Receive
      (This     : in out SPI_Port;
-      Incoming : out UInt8)
+      Incoming : out BT.UInt8)
    is
    begin
       if CRC_Enabled (This) then
@@ -573,14 +572,14 @@ package body STM32.SPI is
          null;
       end loop;
 
-      Incoming := UInt8 (This.Periph.DR.DR);
+      Incoming := BT.UInt8 (This.Periph.DR.DR);
 
       if CRC_Enabled (This) then
          while Rx_Is_Empty (This) loop
             null;
          end loop;
          Read_CRC : declare
-            Dummy : UInt16;
+            Dummy : BT.UInt16;
          begin
             Dummy := This.Periph.DR.DR;
          end Read_CRC;
@@ -590,7 +589,7 @@ package body STM32.SPI is
          null;
       end loop;
 
-      if CRC_Enabled (This) and then CRC_Error_Indicated (This) then
+      if CRC_Enabled (This) and CRC_Error_Indicated (This) then
          Reset_CRC (This);
       end if;
    end Receive;
@@ -601,8 +600,8 @@ package body STM32.SPI is
 
    procedure Transmit_Receive
      (This     : in out SPI_Port;
-      Outgoing : Byte_Buffer;
-      Incoming : out Byte_Buffer;
+      Outgoing : UInt8_Buffer;
+      Incoming : out UInt8_Buffer;
       Size     : Positive)
    is
    begin
@@ -627,7 +626,7 @@ package body STM32.SPI is
             null;
          end loop;
          Read_CRC : declare
-            Dummy : UInt16;
+            Dummy : BT.UInt16;
          begin
             Dummy := This.Periph.DR.DR;
          end Read_CRC;
@@ -637,7 +636,7 @@ package body STM32.SPI is
          null;
       end loop;
 
-      if CRC_Enabled (This) and then CRC_Error_Indicated (This) then
+      if CRC_Enabled (This) and CRC_Error_Indicated (This) then
          Reset_CRC (This);
       end if;
    end Transmit_Receive;
@@ -648,8 +647,8 @@ package body STM32.SPI is
 
    procedure Transmit_Receive
      (This     : in out SPI_Port;
-      Outgoing : UInt8;
-      Incoming : out UInt8)
+      Outgoing : BT.UInt8;
+      Incoming : out BT.UInt8)
    is
    begin
       if CRC_Enabled (This) then
@@ -664,7 +663,7 @@ package body STM32.SPI is
          raise Program_Error;
       end if;
 
-      This.Periph.DR.DR := UInt16 (Outgoing);
+      This.Periph.DR.DR := BT.UInt16 (Outgoing);
 
       --  enable CRC transmission
       if CRC_Enabled (This) then
@@ -676,16 +675,16 @@ package body STM32.SPI is
          null;
       end loop;
 
-      Incoming := UInt8 (This.Periph.DR.DR);
+      Incoming := BT.UInt8 (This.Periph.DR.DR);
 
-      --  Read CRC byte to close CRC calculation
+      --  Read CRC BT.UInt8 to close CRC calculation
       if CRC_Enabled (This) then
          --  wait until data is received
          while Rx_Is_Empty (This) loop
             null;
          end loop;
          Read_CRC : declare
-            Dummy : UInt16;
+            Dummy : BT.UInt16;
          begin
             Dummy := This.Periph.DR.DR;
          end Read_CRC;
@@ -695,10 +694,22 @@ package body STM32.SPI is
          null;
       end loop;
 
-      if CRC_Enabled (This) and then CRC_Error_Indicated (This) then
+      if CRC_Enabled (This) and CRC_Error_Indicated (This) then
          Reset_CRC (This);
       end if;
    end Transmit_Receive;
+
+   ---------------------------
+   -- Data_Register_Address --
+   ---------------------------
+
+   function Data_Register_Address
+     (This : SPI_Port)
+      return System.Address
+   is
+   begin
+      return This.Periph.DR'Address;
+   end Data_Register_Address;
 
    -----------------------------
    -- Send_Receive_16bit_Mode --
@@ -706,8 +717,8 @@ package body STM32.SPI is
 
    procedure Send_Receive_16bit_Mode
      (This     : in out SPI_Port;
-      Outgoing : Byte_Buffer;
-      Incoming : out Byte_Buffer;
+      Outgoing : UInt8_Buffer;
+      Incoming : out UInt8_Buffer;
       Size     : Positive)
    is
       Tx_Count : Natural := Size;
@@ -735,7 +746,6 @@ package body STM32.SPI is
 
          As_Half_Word_Pointer (Incoming (Incoming_Index)'Address).all :=
            This.Periph.DR.DR;
-         Incoming_Index := Incoming_Index + 2;
 
          return;
       end if;
@@ -752,7 +762,7 @@ package body STM32.SPI is
          Tx_Count := Tx_Count - 1;
 
          --  enable CRC transmission
-         if Tx_Count = 0 and then CRC_Enabled (This) then
+         if Tx_Count = 0 and CRC_Enabled (This) then
             This.Periph.CR1.CRCNEXT := True;
          end if;
 
@@ -766,7 +776,7 @@ package body STM32.SPI is
          Incoming_Index := Incoming_Index + 2;
       end loop;
 
-      --  receive the last byte
+      --  receive the last BT.UInt8
       if Current_Mode (This) = Slave then
          --  wait until data is received
          while Rx_Is_Empty (This) loop
@@ -775,7 +785,6 @@ package body STM32.SPI is
 
          As_Half_Word_Pointer (Incoming (Incoming_Index)'Address).all :=
            This.Periph.DR.DR;
-         Incoming_Index := Incoming_Index + 2;
       end if;
    end Send_Receive_16bit_Mode;
 
@@ -785,8 +794,8 @@ package body STM32.SPI is
 
    procedure Send_Receive_8bit_Mode
      (This     : in out SPI_Port;
-      Outgoing : Byte_Buffer;
-      Incoming : out Byte_Buffer;
+      Outgoing : UInt8_Buffer;
+      Incoming : out UInt8_Buffer;
       Size     : Positive)
    is
       Tx_Count : Natural := Size;
@@ -794,7 +803,7 @@ package body STM32.SPI is
       Incoming_Index : Natural := Incoming'First;
    begin
       if Current_Mode (This) = Slave or else Tx_Count = 1 then
-         This.Periph.DR.DR := UInt16 (Outgoing (Outgoing_Index));
+         This.Periph.DR.DR := BT.UInt16 (Outgoing (Outgoing_Index));
          Outgoing_Index := Outgoing_Index + 1;
          Tx_Count := Tx_Count - 1;
       end if;
@@ -811,7 +820,7 @@ package body STM32.SPI is
             null;
          end loop;
 
-         Incoming (Incoming_Index) := UInt8 (This.Periph.DR.DR);
+         Incoming (Incoming_Index) := BT.UInt8 (This.Periph.DR.DR);
 
          return;
 
@@ -823,12 +832,12 @@ package body STM32.SPI is
             null;
          end loop;
 
-         This.Periph.DR.DR := UInt16 (Outgoing (Outgoing_Index));
+         This.Periph.DR.DR := BT.UInt16 (Outgoing (Outgoing_Index));
          Outgoing_Index := Outgoing_Index + 1;
          Tx_Count := Tx_Count - 1;
 
          --  enable CRC transmission
-         if Tx_Count = 0 and then CRC_Enabled (This) then
+         if Tx_Count = 0 and CRC_Enabled (This) then
             This.Periph.CR1.CRCNEXT := True;
          end if;
 
@@ -837,7 +846,7 @@ package body STM32.SPI is
             null;
          end loop;
 
-         Incoming (Incoming_Index) := UInt8 (This.Periph.DR.DR);
+         Incoming (Incoming_Index) := BT.UInt8 (This.Periph.DR.DR);
          Incoming_Index := Incoming_Index + 1;
       end loop;
 
@@ -848,7 +857,6 @@ package body STM32.SPI is
          end loop;
 
          Incoming (Incoming_Index) := Data (This);
-         Incoming_Index := Incoming_Index + 1;
       end if;
    end Send_Receive_8bit_Mode;
 
@@ -899,7 +907,7 @@ package body STM32.SPI is
       Index    : Natural := Outgoing'First;
    begin
       if Current_Mode (This) = Slave or else Tx_Count = 1 then
-         This.Periph.DR.DR := UInt16 (Outgoing (Index));
+         This.Periph.DR.DR := BT.UInt16 (Outgoing (Index));
          Index := Index + 1;
          Tx_Count := Tx_Count - 1;
       end if;
@@ -910,7 +918,7 @@ package body STM32.SPI is
             null;
          end loop;
 
-         This.Periph.DR.DR := UInt16 (Outgoing (Index));
+         This.Periph.DR.DR := BT.UInt16 (Outgoing (Index));
          Index := Index + 1;
          Tx_Count := Tx_Count - 1;
       end loop;
@@ -958,7 +966,7 @@ package body STM32.SPI is
          while Rx_Is_Empty (This) loop
             null;
          end loop;
-         K := UInt8 (This.Periph.DR.DR);
+         K := BT.UInt8 (This.Periph.DR.DR);
       end loop;
    end Receive_8bit_Mode;
 

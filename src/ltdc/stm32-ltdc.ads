@@ -42,7 +42,8 @@
 
 with System;
 
-with STM32.Device; use STM32.Device;
+with STM32.Device;    use STM32.Device;
+with HAL.Framebuffer;
 
 package STM32.LTDC is
 
@@ -69,18 +70,17 @@ package STM32.LTDC is
      (BF_Constant_Alpha,
       BF_Pixel_Alpha_X_Constant_Alpha);
 
-   procedure Initialize
-     (Width         : Positive;
-      Height        : Positive;
-      H_Sync        : Natural;
-      H_Back_Porch  : Natural;
-      H_Front_Porch : Natural;
-      V_Sync        : Natural;
-      V_Back_Porch  : Natural;
-      V_Front_Porch : Natural;
-      PLLSAI_N      : UInt9;
-      PLLSAI_R      : UInt3;
-      DivR          : Natural);
+   procedure Initialize (Width         : Positive;
+                         Height        : Positive;
+                         H_Sync        : Natural;
+                         H_Back_Porch  : Natural;
+                         H_Front_Porch : Natural;
+                         V_Sync        : Natural;
+                         V_Back_Porch  : Natural;
+                         V_Front_Porch : Natural;
+                         PLLSAI_N      : UInt9;
+                         PLLSAI_R      : UInt3;
+                         DivR          : Natural);
 
    function Initialized return Boolean;
    procedure Start;
@@ -109,6 +109,10 @@ package STM32.LTDC is
       return Frame_Buffer_Access;
 
    procedure Reload_Config (Immediate : Boolean := False);
+
+   function To_LTDC_Mode (HAL_Mode : HAL.Framebuffer.FB_Color_Mode)
+                          return STM32.LTDC.Pixel_Format;
+   --  Convert HAL.Framebuffer color mode to LTDC color mode
 
 private
 
