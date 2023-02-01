@@ -19,9 +19,6 @@ arm_cortex = "1.0.0"
 stm32_svd = "1.0.0"
 stm32_middleware = "1.0.0"
 
-[configuration.values.arm_cortex]
-core = "m4f"
-
 
 #stm32_adc_driver = {type = "Boolean", default = false}
 #dac = {type = "Boolean", default = false}
