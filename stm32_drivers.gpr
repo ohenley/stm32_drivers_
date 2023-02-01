@@ -23,6 +23,7 @@ project Stm32_Drivers is
                        "src/fmc",
                        "src/gpio",
                        "src/i2s",
+                       "src/i2c_setup",
                        "src/iwdg",
                        "src/ltdc",
                        "src/pwm",
