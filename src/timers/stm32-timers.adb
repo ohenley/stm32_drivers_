@@ -1465,6 +1465,34 @@ package body STM32.Timers is
    -- Configure_Encoder_Interface --
    ---------------------------------
 
+   procedure Configure_Freq_Capture_Interface
+     (This         : in out Timer;
+      Trigger      : Timer_Trigger_Input_Source;
+      IC1_Polarity : Timer_Input_Capture_Polarity)
+   is
+   begin
+      Select_Input_Trigger (This, Trigger);
+
+      Write_Channel_Input_Description
+        (This,
+         Channel     => Channel_1,
+         Kind        => Direct_TI,
+         Description => Channel_Input_Descriptor'(ICxFilter => 0,
+                                                  ICxPrescaler => Div1));
+
+      case IC1_Polarity is
+         when Rising =>
+            This.CCER (Channel_1).CCxNP := 0;
+            This.CCER (Channel_1).CCxP := 0;
+         when Falling =>
+            This.CCER (Channel_1).CCxNP := 0;
+            This.CCER (Channel_1).CCxP := 1;
+         when Both_Edges =>
+            This.CCER (Channel_1).CCxNP := 1;
+            This.CCER (Channel_1).CCxP := 1;
+      end case;
+   end Configure_Freq_Capture_Interface;
+
    procedure Configure_Encoder_Interface
      (This         : in out Timer;
       Mode         : Timer_Encoder_Mode;
