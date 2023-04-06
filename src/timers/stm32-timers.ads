@@ -895,6 +895,11 @@ package STM32.Timers is
    subtype Timer_Encoder_Mode is
      Timer_Slave_Mode range Encoder_Mode_TI1 .. Encoder_Mode_TI1_TI2;
 
+   procedure Configure_Freq_Capture_Interface
+     (This         : in out Timer;
+      Trigger      : Timer_Trigger_Input_Source;
+      IC1_Polarity : Timer_Input_Capture_Polarity);
+
    procedure Configure_Encoder_Interface
      (This         : in out Timer;
       Mode         : Timer_Encoder_Mode;
