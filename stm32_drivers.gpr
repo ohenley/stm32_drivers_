@@ -40,7 +40,9 @@ project Stm32_Drivers is
                                                "src/stm32f4/i2c",
                                                "src/stm32f4/power_control",
                                                "src/stm32f4/stm32f42x",
+                                               "src/stm32f4/stm32f42x/sdram",
                                                "src/stm32f4/uart",
+                                               "src/sdram",
                                                "src/sai");
       when "stm32f407" =>
          Driver_Src_Dirs := Driver_Src_Dirs & ("src/stm32f4/crc",
