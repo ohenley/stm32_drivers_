@@ -51,10 +51,10 @@ project Stm32_Drivers is
       when "stm32f746x" =>
          Driver_Src_Dirs := Driver_Src_Dirs & ("src/stm32f7/i2c",
                                                "src/sdram",
-                                               "src/stm32f7/stm32f7x/sdram",
                                                "src/stm32f7/power_control",
                                                "src/stm32f7/stm32f7x",
-                                               "src/stm32f7/stm32f7x/dma");
+                                               "src/stm32f7/stm32f7x/dma",
+                                               "src/stm32f7/stm32f7x/sdram");
       when others => null;
    end case;
 
