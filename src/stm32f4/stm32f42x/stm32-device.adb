@@ -879,6 +879,85 @@ package body STM32.Device is
    -- Enable_Clock --
    ------------------
 
+   procedure Enable_Clock (This : in out SAI_Port)
+   is
+   begin
+      pragma Assert (This'Address = SAI_Base);
+      RCC_Periph.APB2ENR.SAI1EN := True;
+   end Enable_Clock;
+
+   -----------
+   -- Reset --
+   -----------
+
+   procedure Reset (This : in out SAI_Port)
+   is
+   begin
+      pragma Assert (This'Address = SAI_Base);
+      RCC_Periph.APB2RSTR.SAI1RST := True;
+      RCC_Periph.APB2RSTR.SAI1RST := False;
+   end Reset;
+
+   ---------------------
+   -- Get_Input_Clock --
+   ---------------------
+
+   function Get_Input_Clock (Periph : SAI_Port) return UInt32
+   is
+      Input_Selector  : UInt2;
+      VCO_Input       : UInt32;
+      SAI_First_Level : UInt32;
+   begin
+      if Periph'Address /= SAI_Base then
+         raise Unknown_Device;
+      end if;
+
+      Input_Selector := RCC_Periph.DCKCFGR.SAI1ASRC;
+
+      --  This driver doesn't support external source clock
+      if Input_Selector > 1 then
+         raise Constraint_Error
+           with "External PLL SAI source clock unsupported";
+      end if;
+
+      if not RCC_Periph.PLLCFGR.PLLSRC then
+         --  PLLSAI SRC is HSI
+         VCO_Input := HSI_VALUE / UInt32 (RCC_Periph.PLLCFGR.PLLM);
+      else
+         --  PLLSAI SRC is HSE
+         VCO_Input := HSE_VALUE / UInt32 (RCC_Periph.PLLCFGR.PLLM);
+      end if;
+
+      if Input_Selector = 0 then
+         --  PLLSAI is the clock source
+
+         --  VCO out = VCO in & PLLSAIN
+         --  SAI firstlevel = VCO out / PLLSAIQ
+         SAI_First_Level :=
+           VCO_Input * UInt32 (RCC_Periph.PLLSAICFGR.PLLSAIN) /
+           UInt32 (RCC_Periph.PLLSAICFGR.PLLSAIQ);
+
+         --  SAI frequency is SAI First level / PLLSAIDIVQ
+         return SAI_First_Level / UInt32 (RCC_Periph.DCKCFGR.PLLSAIDIVQ);
+
+      else
+         --  PLLI2S as clock source
+         SAI_First_Level :=
+           VCO_Input * UInt32 (RCC_Periph.PLLI2SCFGR.PLLI2SN) /
+           UInt32 (RCC_Periph.PLLI2SCFGR.PLLI2SQ);
+         --  SAI frequency is SAI First level / PLLI2SDIVQ
+         return SAI_First_Level / UInt32 (RCC_Periph.DCKCFGR.PLLI2SDIVQ + 1);
+      end if;
+   end Get_Input_Clock;
+
+
+
+
+
+   ------------------
+   -- Enable_Clock --
+   ------------------
+
    procedure Enable_Clock (This : in out SDMMC_Controller)
    is
    begin

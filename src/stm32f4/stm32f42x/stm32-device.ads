@@ -44,6 +44,7 @@
 
 with STM32_SVD;      use STM32_SVD;
 with STM32_SVD.SDIO;
+with STM32_SVD.SAI;
 
 with STM32.DMA;      use STM32.DMA;
 with STM32.GPIO;     use STM32.GPIO;
@@ -465,6 +466,19 @@ package STM32.Device is
    procedure Enable_Clock (This : in out Timer);
 
    procedure Reset (This : in out Timer);
+
+   -----------
+   -- Audio --
+   -----------
+
+   subtype SAI_Port is STM32_SVD.SAI.SAI_Peripheral;
+
+   SAI_1 : SAI_Port renames STM32_SVD.SAI.SAI_Periph;
+
+   procedure Enable_Clock (This : in out SAI_Port);
+   procedure Reset (This : in out SAI_Port);
+   function Get_Input_Clock (Periph : SAI_Port) return UInt32;
+   
 
    -----------
    -- SDMMC --
